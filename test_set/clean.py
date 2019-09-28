@@ -18,13 +18,13 @@ def brackets(test_str):
             ret += i 
     return ret
 file = input("+++")
-text = open("file"+file+".txt","r+").read()
+text = open("abstarct"+file+".txt","r+").read()
 text = brackets(text)
 text = text.replace('>', ' greater than ')
 text = text.replace('<', ' less than ')
 text = text.replace('\n', ' ')
 text = text.replace('-','')
 text=re.sub(r'[\W]', ' ', text)
-with open("clean"+file+".txt","w+") as f:
+with open("abstarct_clean"+file+".txt","w+") as f:
     f.write(text)
     

@@ -11,7 +11,9 @@ nltk.download('wordnet')
 stemmer = PorterStemmer()
 stop_words = stopwords.words('english')
 
-inp = input("Enter String: ")
+f = open("test_set/abstarct_clean1.txt", "r+")
+inp = f.read()
+f.close()
 
 tokens = word_tokenize(inp)
 clean_tokens = tokens = tokens[:]
@@ -22,6 +24,7 @@ for token in tokens:
 
 table = str.maketrans('', '', string.punctuation)
 clean_tokens = [word.translate(table) for word in tokens]
+print(' '.join(clean_tokens))
 
 all_synonyms = []
 
@@ -35,4 +38,4 @@ for word in all_synonyms:
     stemmed.append(stemmer.stem(word))
 
 all_synonyms = list(set(all_synonyms))
-print(all_synonyms)
+# print(all_synonyms)

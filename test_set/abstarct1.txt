@@ -1,16 +1,1 @@
-Abstract. We conduct to our knowledge a first measure-
-ment study of commercial mmWave 5G performance on
-smartphones by closely examining 5G networks in two U.S.
-cities. We conduct extensive field tests on 5G performance
-under diverse conditions including different obstruction lev-
-els, phone-tower distances, and device orientations. We
-systematically analyze the handoff mechanisms in 5G and
-their impact on network performance. We also study app
-performance (web browsing and HTTP download) over 5G,
-and how Internet server selection affects the end-to-end per-
-formance for 5G users. Our experiments consume 10 TB of
-5G data, conducted when 5G just made its debut in April
-2019. These experiments provide a “baseline” for studying
-how 5G performance evolves, and identify key research di-
-rections on improving 5G users’ experience in a cross-layer
-manner.
+Abstract. We conduct to our knowledge a first measure-ment study of commercial mmWave 5G performance on smartphones by closely examining 5G networks in two U.S. cities. We conduct extensive field tests on 5G performance under diverse conditions including different obstruction levels, phone-tower distances, and device orientations. We systematically analyze the handoff mechanisms in 5G and their impact on network performance. We also study app performance (web browsing and HTTP download) over 5G, and how Internet server selection affects the end-to-end performance for 5G users. Our experiments consume 10 TB of 5G data, conducted when 5G just made its debut in April 2019. These experiments provide a “baseline” for studying how 5G performance evolves, and identify key research directions on improving 5G users’ experience in a cross-layer manner.
