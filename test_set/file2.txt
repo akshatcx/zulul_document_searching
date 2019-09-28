@@ -1,0 +1,1916 @@
+Multi-antenna technologies are the key enabler for unlocking the potential of millimeter-wave (mm-wave) spectrum
+bands in 5G-and-beyond networks [1], [2]. A number of
+mm-wave outdoor measurement campaigns, predominantly
+using channel sounder setups with horn antennas, e.g. [3]–[9],
+have now demonstrated the fundamental feasibility of mmwave links in urban environments and resulted in mm-wave
+statistical channel models (see [10] and references therein).
+This year has also seen the first test commercial mm-wave
+outdoor deployments, albeit with limited capabilities and performance [11]. Directional high-gain antenna beams are used
+to overcome the high path loss at mm-wave frequencies, but
+the sensitivity to misalignment of antenna beams [6], [12]
+and the effect of link blockage due to environmental and
+mobile obstacles such as buildings [13] and humans [14],
+remain primary challenges for seamless coverage in large-scale
+mobile network deployments. The key to making mm-wave
+All authors are with the Institute for Networked Systems, RWTH Aachen
+University, Kackertstrasse 9, 52072 Aachen, Germany.
+E-mail: {lku, aic, pma, lsi}@inets.rwth-aachen.de.
+cellular networks a reality is thus exploiting multi-antenna
+technology for robust and precise beamsteering to overcome
+effects of blockage and beam misalignment caused by large
+and small-scale mobility, and provide seamless gigabit-persecond (Gbps) connectivity.
+Great advances have been reported in the literature regarding
+mm-wave antenna technology [15]–[17], but the evaluation of
+these devices has been largely conducted in controlled indoor
+environments. The notable exceptions to this are [18]–[21],
+which demonstrated outdoor coverage measurements using
+mm-wave phased antenna arrays. However, these works lack
+fine-grained angle-of-arrival (AoA) and angle-of-departure
+(AoD) measurements, which are crucial for understanding
+the impact of beam misalignment on mm-wave link and network performance. Other prior outdoor measurement studies,
+e.g. [3]–[9], used horn antenna or omni-directional antenna
+setups. The existing literature thus offers very limited insight
+on the performance of mm-wave antenna arrays in a real
+outdoor urban network environment, in particular with respect
+to the beamsteering opportunities and beam misalignment
+effects, which is an essential input for system-level engineering
+design of future mm-wave networks.
+In this paper, we present the first large-scale outdoor urban
+mm-wave measurement study using a state-of-the-art phased
+antenna array, collecting received signal strength (RSS) data
+over systematic fine-grained 3D AoA and AoD orientations
+in a typical European town. We study the impact of phased
+antenna arrays in terms of the number of link opportunities,
+achievable data rate and robustness under small-scale mobility,
+and directly compare this against reference measurements
+using a horn antenna. Our results show a limited number of
+2–4 available distinct spatial link opportunities per receiver
+location, indicating that the mm-wave multipath richness in a
+typical European town center is surprisingly similar to that in
+dense urban areas as presented in [3]–[5], [7], [9]. The results
+for the phased antenna array reveal that losses in estimated data
+rate of up to 70% occur for small beam misalignments in the
+order of the half-power beamwidth (HPBW), with significant
+and irregular variations in estimated data rate for larger beam
+misalignments due to the non-ideal phased antenna array
+radiation pattern. By contrast, the loss in estimated data rate
+for the horn antenna setup is monotonically increasing with the
+orientation error. This shows that earlier measurement studies
+[6], [12] or theoretical studies [22], [23] of beam misalignment
+effects on mm-wave link and network performance using horn
+antennas or idealized directional antenna patterns cannot be
+arXiv:1909.12024v1 [eess.SP] 26 Sep 2019
+2
+simply generalized. Consequently, we analyze the implications
+that our results have on the design for future beamsteering
+algorithms in mm-wave outdoor network deployments.
+The rest of the paper is organized as follows. Sec. II gives
+the related work overview. Sec. III presents our measurement
+setup and methodology. Our measurement results are presented
+and analyzed in Sec. IV. In Sec. V we discuss the engineering
+implication of our findings for outdoor mm-wave network
+deployments. Finally, Sec. VI concludes the paper.
+II. RELATED WORK
+Recent years have seen great advances in mm-wave phased
+antenna arrays and corresponding transceivers for base stations
+(BSs) and user equipment (UE). For instance, Samsung [17]
+has presented a 28 GHz base station with a 64-element phased
+antenna array, IBM and Ericsson [15] have demonstrated a
+dual-polarized 28 GHz phased antenna array module with 128
+elements, and Sivers IMA has released 16-element mm-wave
+phased antenna array [16]. However, these new mm-wave
+transceivers and phased antenna array designs have largely
+been evaluated in controlled environments [15]–[17], rather
+than in real outdoor urban settings. Notable exceptions to
+this are the studies in [18]–[21]. In [18], [19], and [20] data
+rate measurements with 28 GHz multi antenna arrays were
+conducted in outdoor environments, analyzing the possible
+coverage in potential mm-wave cells. Yet, these studies did not
+include detailed AoA or AoD measurements, which are central
+to understanding the impact of non-ideal, mm-wave phased
+antenna arrays on the design of beamsteering algorithms for
+mm-wave networks. In [21] the RSS over AoD was measured
+at several receiver positions in a car park using an omnidirectional antenna at the receiver and a 60 GHz phased
+antenna array at the transmitter side, finding strong reflected
+paths for many receiver positions. However, [21] did not
+investigate beamsteering opportunities and limitations caused
+by beam misalignment, due to the lack of AoA data. By
+contrast, in this work we present the results of the first
+comprehensive large-scale urban measurement campaign with
+mm-wave phased antenna arrays systematically collecting RSS
+over fine-grained AoA and AoD antenna orientations.
+Independently from the advances in mm-wave multi-antenna
+technology, a number of mm-wave measurement campaigns
+have been conducted in outdoor environments with the aim
+of establishing statistical mm-wave channel models (see [2]
+and references therein). Rappaport et al. [3] conducted seminal measurements at 28, 38, 60 and 70 GHz in Austin,
+Texas, and New York City using a sliding correlator channel
+sounder with mechanically steerable horn antennas to record
+the power delay profile for a limited selected range of AoA and
+AoD combinations at each TX/RX pair. Similar measurement
+methodologies have been employed in other measurement
+campaigns, e.g. [4], [5], [7]–[9], and measurement-based statistical channel models such as the NYU model [25] have
+consequently been proposed (see [10] and references therein).
+Overall, analyzing the number of potential link opportunities,
+the studies in [3]–[5], [7], [9] reported a limited number of
+2–5 mm-wave multipath clusters per TX/RX pair for urban
+areas in different metropolises. However, as these measurements campaigns were conducted with horn or omnidirectional
+antenna setups, they do not allow us to study the impact of
+phased antenna arrays on potential link opportunities and beam
+misalignment in mm-wave networks. By contrast, in this work
+we collected RSS data with mm-wave phased antenna arrays
+over fine-grained AoA and AoD sample points to study these
+open questions. Additionally, we conducted measurements in a
+typical European town rather than a big city like prior studies
+in the literature.
+Lee et al. [12] studied the effect of beam misalignment
+based on measurements taken with a channel sounder and horn
+antennas. To that end, power measurements were systematically collected across azimuth angles at 28 and 38 GHz in both
+free-space and urban environments. The general conclusion
+based on these horn antenna measurements was that for a fixed
+beamwidth, the power loss increases linearly with increasing
+beam misalignment until saturation is reached. This confirms
+the results of Simic´ et al. in [6], where the RSS over AoA
+and AoD was systematically measured with a horn antenna
+setup in an urban environment in the 60 GHz band. The
+results in [6], [12] stand in stark contrast to the results of our
+phased antenna array measurements in this paper, which show
+a non-linear relationship between misalignment and power
+loss. To demonstrate that this is caused by the non-ideal,
+phased antenna array pattern, we also explicitly compare our
+measurements against those with a horn antenna in the same
+outdoor scenarios. Our comparison underlines the paradigm
+shift that occurs in terms of beam misalignment effects when
+moving from horn antennas to real phased antenna arrays.
+In addition to empirical research, the effect of beam misalignment on mm-wave network performance has also been
+addressed from a theoretical perspective, e.g. in [22], [23].
+These approaches typically make use of simple and idealized
+antenna radiation pattern models to investigate the effect of
+fundamental antenna parameters such as beamwidth on various
+metrics of system performance. Moreover, analyses regarding
+beam misalignments have mainly focused on misalignments
+smaller than the main lobe beamwidth [22]. Wildman et al.
+[23] do consider larger beam misalignments from a theoretical
+perspective and show that in theory sidelobes can be beneficial
+to the success probability of a transmission in low density networks and that the spatial throughput and transmission capacity maximizing beamwidth has a nearly linear relationship with
+the mean orientation error for Gaussian and sectored antenna
+radiation pattern models. As such idealized radiation pattern
+models are much more similar to a horn antenna radiation
+pattern than that of a real mm-wave phased antenna array,
+our results strongly suggest that such a linear relationship will
+not hold in real mm-wave deployments and that the severe
+consequences of this idealization on the requirements and
+opportunities of beamsteering algorithms and network system
+design have been underestimated. Therefore, our work forms
+a basis for realistic models of beam misalignment effects in
+urban 5G-and-beyond mm-wave networks.
+3
+Transmitter position
+RX C
+Receiver position
+RX B
+RX A
+RX D
+TX 1
+TX 2
+B
+D
+Fig. 1: Aerial view of the TX (1-2) and RX positions (A-D),
+with the initial antenna orientations indicated by an arrow.
+The measurement scenarios are listed in Table I. (Photo
+courtesy of [26]).
+III. MEASUREMENT SETUP & METHODOLOGY
+Our outdoor measurement campaign was conducted in the
+German town of Langenfeld. The measurement area constitutes the central pedestrian zone with mainly shops in the
+surroundings and only delivery trucks being allowed to enter.
+The buildings typically have 2-5 floors and are constructed
+of concrete with large windows and some metal parts on the
+facades. The measurements were conducted over the course
+of 12 days during the summer of 2018, with dry weather and
+temperatures of around 25◦ C.
+The transmitter (TX) was located at different positions on
+the rooftop of a multi-floor car park at a height of 9.7 m. The
+receiver (RX) positions A–D were located in the pedestrian
+zone, i.e. on ground level, with the mounted antenna at a height
+of 1.7 m. Fig. 1 shows an aerial image of the area where
+the TX positions (1, 2) and RX positions (A, B, C, D) are
+marked. Fig. 2 shows the different TX and RX positions during
+the measurements. The RX is circled in green and the TX in
+orange. In case the LOS is blocked, a green square indicates
+the geometric LOS direction. The positions were chosen based
+on representative scenarios as follows:
+• TX1-RXA: Typical scenario for small cell, with clear LOS
+and TX-RX distance of 25 m (Figs. 2a-2b).
+• TX1-RXB and TX2-RXB: RX-B was chosen to investigate
+the effects of an obstructed LOS and evaluate the coverage from different TX positions for the same RX position.
+In scenario TX1-RXB the LOS is partially blocked by
+a building corner, while in scenario TX2-RXB the LOS
+is partially blocked by a lamp-post with a flower box
+mounted on it (Figs. 2c-2f).
+• TX1-RXC: Represents a typical street canyon with 18 m
+width and buildings to the left and to the right. The
+large TX-RX distance of 65 m makes this representative
+of cell-edge distances in a mm-wave small cell. The
+LOS path was predominantly clear despite tree foliage
+(Figs. 2g-2h).
+• TX2-RXD: Scenario chosen to investigate the effect of tree
+foliage on mm-wave coverage, with a TX-RX distance
+of 28 m and clearly visible trees obstructing the LOS
+(Figs. 2i - 2j).
+For our measurement campaign we used two different
+60 GHz transceiver setups, one utilizing a phased antenna
+array and the other utilizing a standard horn antenna for
+comparison. A relatively narrowband signal transmission was
+chosen (1 MHz) to obtain fine-grained RSS and angle orientation data, allowing us to have a robust setup that does
+not require strict calibration as the gain over the frequency
+band is flat and the time-component of the channel is not
+recorded. Importantly, since we are not interested in a timecharacterization of the channel, the narrowband power measurements are sufficient for our objective of characterizing
+mm-wave link opportunities in a typical outdoor environment
+and beamsteering requirements for maintaining a reliable link
+connectivity under small-scale mobility. Both setups utilize
+software-defined radios (SDRs), facilitating transport and use
+in different locations. We note that the frequency bands in
+the range of 24–86 GHz are under consideration for 5G-andbeyond mm-wave cellular networks [27]. In this paper, we
+report measurements in the 60 GHz band without the loss of
+generality, due to equipment availability and for comparability
+with prior mm-wave outdoor urban measurement studies,
+e.g. [3], [6], [18], [21].
+A. Phased Antenna Array Setup
+We used the SiversIMA 60 GHz phased antenna array radio
+frequency integrated circuit (RFIC) TRX BF/01 [24] with the
+corresponding evaluation kit EVK06002 [28]. The setup is
+capable of operating in the frequency range from 57 GHz–
+71 GHz. The included RF module uses direct conversion in
+both TX and RX mode. It includes a 16+16 (TX/RX) patch
+antenna module, with each antenna array consisting of 16×2
+microstrip patch antenna elements directly connected to the
+RFIC [16]. Fig. 3a shows a schematic drawing of the phased
+antenna array board and the RFIC. The phase weights and
+amplitudes are applied to the signal in the analog RF domain
+using 16 independent RF paths. Thus, only azimuth plane
+beamsteering is allowed in the range [+45◦
+, −45◦
+], based on a
+codebook with up to 64 different antenna pattern entries. The
+phased array transceiver was controlled via a USB interface.
+Figs. 3c-3d compare the measured phased antenna array radiation pattern with the simulated one obtained using
+MATLAB’s phased antenna array toolbox based on generic
+patch antenna elements. We note the considerable differences
+between the ideal simulated radiation pattern and the real, nonideal measured radiation pattern.
+4
+(a) TX 1 seen from RX A. (b) RX A seen from TX 1. (c) TX 1 and RX B. (d) RX B seen from TX 1. (e) TX 2 seen from RX B.
+(f) RX B seen from TX 2. (g) TX 1 seen from RX C. (h) RX C seen from TX 1. (i) TX 2 and RX D. (j) RX D seen from TX 2.
+Fig. 2: TX and RX in different positions during measurements. The RX is circled in green and TX in orange. In case the
+LOS is blocked, a green square indicates the geometric LOS direction.
+y
+x
+2a
+(a) Phased antenna array
+board with a = 0.71mm,
+y = 2.4mm, x = 2.97mm.
+0
+◦
+30◦
+60◦
+90◦
+120◦
+150◦
+180◦ 210◦
+240◦
+270◦
+300◦
+330◦
+−40 dBi
+−30 dBi
+−20 dBi
+−10 dBi
+0 dBi
+10 dBi
+20 dBi
+H-plane E-plane
+(b) The simulated horn antenna
+power pattern.
+0
+◦
+30◦
+60◦
+90◦
+120◦
+150◦
+180◦ 210◦
+240◦
+270◦
+300◦
+330◦
+−50 dB
+−40 dB
+−30 dB
+−20 dB
+−10 dB
+0 dB
+Measurement Simulation
+(c) The phased antenna array
+H-plane power pattern normalized
+to unity at the maximum.
+0
+◦
+30◦
+60◦
+90◦
+120◦
+150◦
+180◦ 210◦
+240◦
+270◦
+300◦
+330◦
+−50 dB
+−40 dB
+−30 dB
+−20 dB
+−10 dB
+0 dB
+Measurement Simulation
+(d) The phased antenna array
+E-plane power pattern normalized to
+unity at the maximum.
+Fig. 3: Schematic drawing of the SiversIMA TRX BF/01
+phased antenna array board and antenna radiation patterns.
+The schematic of the overall phased antenna array setup
+is shown in Fig. 4. The left part of the figure shows the
+TX including host PC 1, USRP X310 SDR with LFTX
+daughterboards, and the phased antenna array transceiver.
+The right part of the figure shows the RX consisting of an
+equivalent setup. The host PC 1 generates a complex sinusoidal
+signal at the frequency fsin = 250 kHz and streams it to the
+USRP. The USRP generates a baseband signal with a sampling
+rate fs = 1 MHz which is fed to the phased antenna array
+transceiver. The phased antenna array transceiver upconverts
+the signal to a frequency fc = 58.32 GHz, and transmits the
+signal over the air. The RX phased antenna array downconverts
+the received signal and feeds it to the USRP, which samples the
+signal with a sampling rate fs = 1 MHz. The complex samples
+are streamed to the host PC 2, where the power spectrum of the
+received signal is computed using a flattop window. Finally,
+the signal strength RSSA,meas of the received sinusoidal signal
+is extracted from the power spectrum, which was calibrated
+against an Agilent E4440A spectrum analyzer.
+B. Horn Antenna Setup
+For comparison, our second setup used the FC1005V/00
+V-band converter by SiversIMA [29] and a standard 15 dBi
+gain horn antenna by Flann Microwave [30]. The FC1005V/00
+is capable of up- and downconverting to and from 57-66 GHz
+using an intermediate frequency (IF) bandwidth of 1-5 GHz.
+Fig. 3b shows the simulated radiation pattern of the standard
+gain horn antenna.
+The schematic of the horn antenna setup is shown in Fig. 5.
+The left part of the figure shows the TX including the host
+PC 1, USRP N210 with WBX daughterboard, Sivers IMA
+FC1005V/00 upconverter and the horn antenna. The right part
+of the figure shows the RX consisting of a similar setup
+as the TX. The transmission and reception signal chain of
+the horn antenna setup is equivalent to the phased antenna
+array setup (cf. Sec. III-A), except that the signal between the
+USRP and up-/downconverter is at the intermediate frequeny
+fIF = 1.32 GHz and not at baseband. The RSS at the horn
+antenna setup RSSH,meas was obtained by the same calibrated
+procedure as described in Sec. III-A.
+5
+Host PC 1 USRP
+X310
+USRP
+X310 Host PC 2
+d
+TX RX
+TRX BF/01 TRX BF/01 Sivers IMA Sivers IMA
+& EVK06002 & EVK06002
+Fig. 4: Schematic of the phased antenna array setup. Link distance d depends on the TX/RX locations.
+Host PC 1 USRP
+N210
+SiversIMA
+FC1005V/00
+SiversIMA
+FC1005V/00
+USRP
+N210 Host PC 2
+d
+TX RX
+Fig. 5: Schematic of the horn antenna setup. Link distance d depends on the TX/RX locations.
+(a) 3D turntable with mounted
+antenna array transceiver
+-180°
+-45°
+ 45°
+-45°
+ 45° -45°
+ 45°
+-45°
+27°
+180°
+-90°
+-84°
+6° 12°
+102°
+108°
+-135°
+-39°
+57°
+153°
+Beamsteering
+Turntable
+Total
+(b) Combination of mechanical
+turntable angle φt t and electronic
+beamsteering angle φbeam used for
+the receiver azimuth angle φRX
+Fig. 6: Automated 3D turntable with mounted antenna array
+transceiver used in the measurements.
+C. Measurement Procedure
+To identify potential link opportunities and their respective
+antenna orientations (AoD, AoA), we systematically swept the
+angular space by changing the beam orientations at the TX and
+RX. Each beam orientation can be characterized by a pair of
+azimuth and elevation angles (φ, θ). As the phased antenna
+array transceiver only allows beamsteering in a 90◦
+azimuth
+range and the horn antenna setup cannot electronically steer
+its beam, we have used a custom made 3D turntable to help
+cover the complete angular space with additional mechanical
+movements when the range of electronic beamsteering was
+exceeded. The turntable uses two stepper motors for azimuth
+and elevation movement. The automated 3D turntable with the
+mounted phased antenna array transceiver is shown in Fig. 6a.
+1) Phased Antenna Array Transceiver: For the measurements, we covered all orientations within azimuth
+φRX ∈ [−180◦
+, 180◦
+) and elevation θRX ∈ [−30◦
+, 60◦
+] at
+each RX position. The range of elevation angles was chosen
+based on observation of potential link opportunities, taking
+into account the positioning of the TX and RX. The elevation
+resolution of ∆θRX = 30◦ was chosen based on the E-plane
+HPBW of 36◦
+found in the phased antenna array radiation
+pattern measurements (cf. Fig. 3d). The azimuth resolution
+was chosen to be ∆φ = 6
+◦
+corresponding to the HPBW of the
+azimuth-plane radiation pattern (cf. Fig. 3c). To change the
+azimuth angle orientation at the RX, we used a combination of
+mechanical movement by the 3D turntable and the electronic
+beamsteering, φRX = φtt + φbeam, as shown in Fig. 6b.
+The measurement time per RX orientation (φRX, θRX) was
+1 second. A complete sweep over all RX orientations for a
+single fixed TX orientation took 500 s.
+Once such an RX sweep was finished, the TX changed
+its azimuth orientation and another RX measurement run
+was started. Analogously to the RX, the transmitting phased
+antenna array transceiver was mounted on a 3D turntable, with
+the elevation angle fixed to θT X = −15◦ based on the large
+E-Plane HPBW and the higher positioning on the rooftop
+of a parking lot. The azimuth angle of the TX orientation
+was changed in ∆φT X = 6
+◦
+steps by a combination of
+mechanical turntable movement and electronic beamsteering,
+as described previously. The range of azimuth angles to be
+covered was chosen to be φT X ∈ [−90◦
+, 84◦
+] w.r.t. the initial
+TX antenna orientation. Hence, the total measurement time for
+all TX/RX combinations with the phased antenna array setup
+was 30×500 s, or 4 hours and 10 minutes. The overall angular
+coverage per position is presented in Table I.
+2) Horn Antenna Array Transceiver: To mechanically steer
+the transceiver in various orientations, the horn antenna RX
+setup was mounted on a 3D turntable, similar to that shown
+in Fig. 6a for the phased antenna array. For the measurements,
+we chose to cover all RX azimuth angles φRX ∈ [−180◦
+, 180◦
+)
+with a resolution ∆φRX = 6
+◦
+, identical to the phased antenna
+array setup, so that the obtained results can be readily compared. Furthermore, we chose to cover the range of elevation
+angles θRX ∈ [−30◦
+, 60◦
+] with a higher resolution than for the
+phased antenna array setup, i.e. ∆θRX = 10◦
+, to allow a finergrained identification of AoA and identify potential scattering
+or reflecting objects. On the transmitter side, the horn antenna
+setup was also mounted on a 3D turntable and the elevation
+angle was fixed to θT X = −15◦
+, as used for the phased antenna
+array and in accordance with the broad E-Plane HPBW of 34◦
+(cf. Fig. 3b).
+A measurement run for a fixed transmitter orientation took
+considerably longer using the horn antenna setup than using
+the phased antenna array setup, due to the fact that all movements in elevation or azimuth were achieved by mechanical
+movement of the 3D turntable. To strike a balance between the
+time spent for measurements with each setup, we limited the
+range of horn antenna TX azimuth angles per measurement
+position, ensuring that a minimum range of 54◦
+centered
+6
+TABLE I: Measurements scenarios with ID consisting of a number (TX position), capital letter (RX position) and small letter
+(setup: (a) phased antenna array and (h) horn antenna). The distance d is the 3D link distance. Nmeas,tot is the total number
+of measured TX/RX beam orientation combinations.
+ID TX RX d (m) Type Setup θT X(
+◦
+) φT X(
+◦
+) θRX(
+◦
+) φRX(
+◦
+) Nmeas,tot
+1Aa 1 A 25.3 LOS Array -15 -90:6:84 -30:30:60 -180:6:174 7200
+1Ah 1 A 25.3 LOS Horn -15 -54:6:42 0:10:60 -180:6:174 7140
+1Ba 1 B 43.8 NLOS Array -15 -90:6:84 -30:30:60 -180:6:174 7200
+1Bh 1 B 43.8 NLOS Horn -15 -54:6:6 0:10:60 -180:6:174 4620
+1Ca 1 C 64.9 LOS Array -15 -90:6:84 -30:30:60 -180:6:174 7200
+1Ch 1 C 64.9 LOS Horn -15 -24:6:30 -30:10:60 -180:6:174 6000
+2Da 2 D 27.8 NLOS Array -15 -72:6:52 -30:30:60 -180:6:174 5200
+2Ba 2 B 63.2 NLOS Array -15 -90:6:84 -30:30:60 -180:6:174 7200
+TABLE II: System parameters of the antenna setups and the
+wideband 5G NR system model.
+Horn ant.
+setup
+Phased ant.
+array setup
+Wideband
+5G-NR
+model
+Main lobe gain G (dBi) 15 16 –
+EIRP (dBm) 9.61 3.95 25
+Sensitivity S (dBm) -91 -104 -74.4
+around the LOS direction was systematically covered with
+a ∆φT X = 6
+◦ granularity. The overall angular coverage per
+position is presented in Table I.
+D. Post-Processing of Measurement Data
+In our analysis in Sec. IV, we take two different perspectives
+on our measurement results. First, we study the link opportunities in a typical European town in Sec. IV-A, i.e. we are
+essentially interested in the path loss that a signal experiences
+between TX and RX for different antenna orientations. Therefore, we present the RSS of both measurement setups for
+a normalized nominal link budget so as to eliminate effects
+that may occur due to different antenna gains or different
+equivalent isotropically radiated powers (EIRPs) between the
+measurement setups. Second, we estimate the achievable data
+rate in mm-wave cells to analyze the effect of beam misalignment on the link performance, presented in Sec. IV-B. To this
+end, we assume the TX to be a BS operating at a fixed EIRP,
+and estimate the achievable data rates at the receiving UE
+based on our measurements. In the following, we detail the
+post-processing steps taken to obtain the data presented in
+Sec. IV-A and Sec. IV-B from our RSS measurements.
+RSS with Normalized Nominal Link Budget: We obtain the
+normalized RSS for the phased antenna array setup RSSA
+and the horn antenna setup RSSH from the measured RSS
+RSSA,meas and RSSH,meas, respectively, by making equal the
+nominal link budget for both measurement setups, i.e.
+RSSA = RSSA,meas + Cc, (1)
+RSSH = RSSH,meas . (2)
+The constant Cc is the difference between the actual link
+budgets of the measurement setups, i.e.
+Cc = E IRPH + GH − (E IRPA + GA), (3)
+where E IRPH and E IRPA are the EIRPs of the horn antenna
+setup and the phased antenna array setup during the measurements, respectively, and GH and GA are the estimated main
+lobe antenna gains of the horn antenna and the phased antenna
+array, respectively. The values of these parameters are given
+in Table II. We note that the validity of our results is not
+compromised by this operation as the sensitivity of the phased
+antenna array setup SA,meas was considerably lower than the
+sensitivity of the horn antenna setup SH,meas. The sensitivity
+of our overall measurement system after the normalization is
+still limited by the horn antenna measurement setup, i.e.
+S = max{SH,meas, SA,meas + Cc } = −91 dBm. (4)
+The normalized received signal strengths RSSA and RSSH
+obtained after this post-processing operation are presented in
+Sec. IV-A .
+Estimating Achievable Data Rate: To analyze the effect
+of beam misalignment on the link performance in mmwave cells, we mapped RSSA,meas and RSSH,meas to the
+estimated achievable data rate T, assuming a fixed BS EIRP
+of E IRPBS = 25 dBm, in line with existing regulations for
+wideband transmissions at 60 GHz [31]. First, the measured
+received signal strengths RSSA,meas and RSSH,meas were
+scaled according to the additional power that receivers would
+receive for a BS transmitting with E IRPBS, i.e.
+RSS0
+A = RSSA,meas + (E IRPBS − E IRPA), (5)
+RSS0
+H = RSSH,meas + (E IRPBS − E IRPH ). (6)
+The overall sensitivity S
+0 of our overall measurement system
+is then given by
+S
+0 = max{SH,meas + (E IRPBS − E IRPH ),
+SA,meas + (E IRPBS − E IRPA)} (7)
+= −75.61 dBm. (8)
+To then map RSS0
+A
+and RSS0
+H
+to the estimated, achievable
+data rate T for a wideband system, we used the Verizon 5GNR model which demonstrated a maximum throughput of
+4 Gbps using an 800 MHz bandwidth [32]. An attenuated and
+7
+truncated version of the Shannon bound is used as a mapping
+function, similar to those used for modeling of link adaption
+in LTE [33] and for 5G NR coexistence in [34], i.e.
+T =
+
+
+
+0 for SN R < SN Rmin,
+αW log2
+(1 + SN R)
+for SN Rmin ≤ SN R
+and SN R ≤ SN Rmax,
+Tmax for SN R > SN Rmax,
+(9)
+where W = 800 MHz denotes the system bandwidth,
+α = 0.75 is the correction factor to account for implementation losses, SN Rmin = −4.5 dB, and SN Rmax = 20 dB1
+.
+The modeled receiver is assumed to have a noise figure of
+NF = 10 dB and implementation loss of LI = 5 dB such that
+the SNR is calculated from our data as
+SN R = RSS0
+A/H
+− (N + NF + LI) (10)
+where N = 10 log10(kBT) with Boltzmann constant k is
+the thermal noise for assumed temperature T = 290 K.
+The estimated data rate ranges from Tmin = 263 Mbps for
+SN Rmin = −4.5 dB to Tmax = 4 Gbps for SN Rmax = 20 dB.
+We note that this post-processing step does not compromise
+the validity of our measured data since the sensitivity S
+0
+is still
+sufficiently low to ensure detection of all signals that result in
+a data rate greater than zero, i.e.
+SN R(RSS = S
+0
+) = −5.61 dB < SN Rmin. (11)
+The estimated data rate T obtained after this post-processing
+operation is presented in Sec. IV-B.
+IV. MEASUREMENT RESULTS & ANALYSIS
+In this section, we present the results of the measurement
+campaign outlined in Sec. III. In Sec. IV-A, we analyze
+available link opportunities in terms of the observed multipath
+clusters based on measured RSS, and we trace the corresponding independent physical propagation paths between TX and
+RX. In Sec. IV-B, we analyze the effects of beam misalignment
+on the estimated achievable mm-wave data rate.
+A. Link Opportunities & AoA Analysis
+In the following, we study significant link opportunities
+that were found during our measurement campaign, trace the
+corresponding physical propagation paths on an environment
+map and analyze the observed differences between the phased
+antenna array and horn antenna measurement data. To that
+end, we present our results as follows. Figs. 7-8 present
+the RSS versus RX orientations in a heatmap which allows
+us to investigate the structure of received multipath clusters.
+Here we assume for each RX orientation (φRX, θRX) the best
+corresponding transmitter orientation φT X found during the
+measurements, in order to show the full set of multipath
+clusters available at each receiver location. Fig. 9 illustrates
+the same underlying data as in Figs. 7-8 in terms of the AoA
+1We point out that, even though we give SN Rmin and SN Rma x in dBscale for better comprehensibility, the formula to convert to data rate in (9)
+requires SNR in linear units
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+H (dBm)
+(a) 1Ah measurement: TX1, RX location A, horn antenna.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+H (dBm)
+(b) 1Bh measurement: TX1, RX location B, horn antenna.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+H (dBm)
+(c) 1Ch measurement: TX1, RX location C, horn antenna.
+Fig. 7: RSS versus RX orientation for horn antenna
+measurements at different TX-RX locations (assuming
+optimal TX orientation).
+and how it is related to the environment, showing polar plots
+of the RSS in a schematic environment map of the study area.
+Finally, we present Fig. 10 where we trace the corresponding
+independent physical propagation paths between TX and RX
+based on the AoA, AoD, and potential reflectors in the study
+area. In the following, our results are presented based on
+Figs. 7-10 location-by-location.
+We start our analysis with a typical scenario for a mm-wave
+small cell with a clear LOS, i.e. at RX location A. As expected,
+a strong LOS cluster is observed for both the horn antenna and
+the phased antenna array measurement setup in the heatmaps
+in Fig. 7a and Fig. 8a, respectively. Nonetheless, we observe
+the distinct effect of the different antenna patterns on the RSS
+measured with respect to the RX steering angle. While the
+horn antenna measurement in Fig. 7a exhibits a smooth cluster,
+the same cluster appears irregular for the phased antenna array
+measurement shown in Fig. 8a2
+. Similarly, the AoA polar plot
+for scenario 1A in Fig. 9a allows us to clearly recognize the
+impact of the horn antenna and phased antenna array radiation
+patterns (cf. Fig. 3b– 3c). The consequence of this is that
+the non-ideal, phased antenna array radiation pattern makes it
+much more difficult to identify true independent propagation
+paths. For instance, let us consider in Fig. 9a the AoA polar
+plot, which exhibits several peaks for the phased antenna array
+RSS. The first peak around φRX = 0
+◦ points in the LOS
+direction. Additionally, we observe peaks around φRX = −30◦
+,
+2
+In Fig. 8, we note that the measurement points are not spaced equidistantly
+over azimuth angles φRX . This is due to the imperfect beam steering with
+the manufacturer-supplied beambook, i.e. we observed an offset between the
+beam steering angle that we set and the actual angle of the main lobe seen at
+the over-the-air interface. We measured the offset for all beamsteering angles
+and correct for these offsets during the post-processing of the results.
+8
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+A (dBm)
+(a) 1Aa measurement: TX1, RX location A, phased antenna array.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+A (dBm)
+(b) 1Ba measurement: TX1, RX location B, phased antenna array.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+A (dBm)
+(c) 1Ca measurement: TX1, RX location C, phased antenna array.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+A (dBm)
+(d) 2Ba measurement: TX2, RX location B, phased antenna array.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+A (dBm)
+(e) 2Da measurement: TX2, RX location D, phased antenna array.
+Fig. 8: RSS versus RX orientation for phased antenna array
+measurements at different TX-RX locations (assuming
+optimal TX orientation).
+φRX = 30◦
+, φRX = −84◦
+, and φRX = 127◦
+. Taking into
+account AoD information (not shown for brevity), we can
+identify that the high RSSs at φRX = −84◦
+and φRX = 127◦
+correspond to independent secondary NLOS paths, which are
+shown in the environment map in Fig. 10a. By contrast, the
+high RSSs around φRX = −30◦
+and φRX = 30◦
+are due to
+sidelobes that point into the LOS direction, thereby falsely
+indicating independent propagation paths. This is clear when
+looking at the map in Fig. 9a, as there are no reflectors at
+φRX = −30◦
+and φRX = 30◦
+from the RX. However, this
+may cause problems to beamsteering algorithms that do not
+have information about the environment and the AoD. For
+instance, an algorithm may generate a list of orientations
+supposedly corresponding to viable independent propagation
+paths during initial beam training. Then in the case of detected
+blockage on the primary path, it may switch to a falsely
+indicated propagation path, i.e. it switches to a sidelobe over
+the same path. Consequently, it would fail to overcome the
+link blockage.
+We next consider RX location B. Again we start our analysis
+by comparing the heatmap of the horn antenna measurement
+in Fig. 7b with the heatmap of the phased antenna array
+measurement in Fig. 8b. In line with the observations for
+RX location A, we note the significant differences between
+the cluster appearance for horn antenna and phased antenna
+array measurements. However, in contrast to the results at RX
+location A, two almost equally strong multipath clusters are
+observed for RX location B. Fig. 9b shows the AoA polar plot
+for the measurement scenario 1B. Combining knowledge of the
+AoA, the environment, and the steered phased antenna array
+radiation pattern, we can trace the two physical propagation
+paths as shown in Fig. 10a, where the NLOS path likely
+included the reflection from a shop window. Nonetheless, we
+observe again that tracing the physical propagation paths is
+difficult purely based on AoA information (cf. Fig. 9b), as
+previously described for receiver location A. In contrast to
+the measurement 1Aa, we point out that AoD information
+is not helpful in measurement scenario 1Ba to distinguish
+between a true independent propagation path and a sidelobeinduced high RSS. The reason is that the AoD is the same
+for both the LOS and NLOS path (cf. Fig. 10a) with our
+AoD measurement resolution of around 6
+◦
+. Overall, we can
+draw two conclusions based on these observations. On the one
+hand, the observation of having multiple link opportunities is
+promising for mm-wave system designers as it suggests that
+mm-wave coverage can also be provided for urban scenarios
+with a partly blocked LOS. On the other hand, our results
+suggest that even knowing both AoA and AoD may not be
+sufficient to reliably identify true independent propagation
+paths. Instead, we used both a priori environment information
+and knowledge of the real steered phased antenna array radiation pattern to identify such independent propagation paths. In
+practice, future commmercial mobile mm-wave systems will
+not have such perfect, a priori information. Consequently,
+other strategies will be needed to identify true independent
+propagation paths. For instance, in scenarios with high link
+budget, using a nearly omni-directional radiation pattern at the
+receiver to record the power delay profile may allow extracting
+the number of independent propagation paths based on time
+of arrival [7]. Alternatively, environment-awareness will be
+essential for robust mm-wave beamsteering.
+Let us now consider RX location C to investigate a LOS
+scenario that is similar to that of RX location A. The
+differences are an increased TX–RX distance and the fact
+that RX C is positioned in an 18 m wide street canyon
+with buildings to either side. Nonetheless, the heatmap of
+the horn antenna measurement in Fig. 7c and the phased
+antenna array measurement in Fig. 8c strongly resemble the
+heatmaps obtained for RX location A (cf. Fig. 7a and Fig. 8a,
+respectively). We combine the knowledge of the AoA shown in
+Fig. 9c, AoD (not shown here for brevity) and the knowledge
+of the environment to trace the independent NLOS paths for
+RX location C. These are shown in the environment map in
+Fig. 10a. However, we emphasize that these are difficult to
+trace solely based on the AoA polar plot in Fig. 9c due to the
+9
+0°
+127°
+-84°
+TX 1
+RX A
+Pharmacy
+(a) 1A measurement.
+Shop
+"fielmann"
+0°
+-132°
+RX B
+TX 1
+(b) 1B measurement.
+0°
+RX C
+TX 1
+(c) 1C measurement.
+Shop
+"fielmann"
+0°
+-71°
+RX B
+TX 2
+115°
+(d) 2B measurement.
+0°
+-30°
+TX 2
+RX D
+60°
+(e) 2D measurement.
+Concrete object/wall
+Metal/window
+Lamppost/metal obj.
+RSS, horn antenna, TX1
+RSS, phased array, TX1
+Trees
+RSS, phased array, TX2
+(f) Legend.
+Fig. 9: Illustrated RSS over azimuth angles per TX-RX pair. The RSS polar plots are normalized to the maximum RSS per
+RX location to focus on the AoA analysis.
+irregular, phased antenna array radiation pattern. For instance,
+the AoA at RX location C (cf. Fig. 9c) looks similar to the
+AoA at RX location A (cf. Fig. 9a). Yet, at RX location A
+the high RSS at angle φRX = 30◦
+is caused by a sidelobe
+whereas it corresponds to a true independent propagation path
+at RX location C. This underlines the difficulty of identifying
+viable independent physical propagation paths by one-sided
+RSS measurements.
+Let us now investigate measurements that were conducted
+with the TX at location TX 2, i.e. at the corner of the car
+park. First, we consider the RX location B for which we
+already discussed the measurement results from a transmitter
+at location TX 1. Again the LOS is obstructed, this time by
+a lamppost with a flower box mounted on it. The distance
+between TX 2 and RX B was 63 m. Fig. 8d shows the
+heatmap for the TX 2 - RX B pair, where we note several
+multipath clusters, the strongest received around φRX = −71◦
+.
+Fig. 9d shows the corresponding AoA polar plot, where
+we can see the peaks around φRX = −71◦
+, φRX = 115◦
+,
+and φRX = 0
+◦
+. All three orientations correspond to true
+independent signal propagation paths as shown in the environment map in Fig. 10b. The signal was likely reflected
+at several shop windows. The independent propagation paths
+were traced and distinguished from sidelobe-induced high RSS
+using information about the environment and the steered RX
+phased antenna array radiation pattern (not shown here for
+brevity). The latter does not have sidelobes that could have
+caused a high RSS at these RX orientations. We emphasize that
+AoD information cannot help to distinguish true independent
+propagation paths from sidelobes, as previously described for
+measurement 1Ba. Overall, these results support the previous
+observations that multiple mm-wave link opportunities can
+be found even in distant and NLOS scenarios in the given
+urban environment, but identifying independent propagation
+paths requires combined knowledge from different sources, i.e.
+environmental awareness, beyond pure RSS measurements.
+Finally, we evaluate the measurement results from RX
+location D where the LOS path from the transmitter in location
+TX 2 was obstructed by the foliage of a tree. Nevertheless, the
+heatmap in Fig. 8e shows higher RSS values at φRX = 0
+◦
+, i.e.
+in the direction of the transmitter, than for other orientations.
+The path loss for the LOS path is 8 dB higher than free
+space path loss, likely due to the foliage. In addition to the
+LOS path, we can identify NLOS paths based on the AoA
+polar plot in Fig. 9e, AoD (not shown here for brevity), and
+knowledge of the environment. Metal columns in front of a
+building and a lamppost likely reflected the signals as shown
+in the environment map in Fig. 10b.
+Overall, our measurements show 2–4 multipath clusters per
+receiver position. Reflections were mainly caused by metal or
+10
+RX C RX B
+RX A
+TX 1
+Concrete object/wall
+Metal/window
+Lamp-/metal post
+LOS path
+NLOS path
+Transmitter position
+Receiver position
+Trees
+(a) Signal paths from transmitter 1.
+RX B
+RX A
+RX D
+TX 1
+TX 2
+(b) Signal paths from transmitter 2.
+Fig. 10: Maps showing the LOS/NLOS path traces from the
+different TX and RX positions. The materials of buildings
+and other objects are also indicated.
+glass on facades and, somewhat surprisingly, by lampposts,
+enabling potential NLOS links in multiple scenarios. We
+observed significant differences between the measurements
+with the phased antenna arrays as compared to measurements
+with the horn antenna. In particular, we noted that determining independent propagation paths purely based on onesided phased antenna array RSS measurements was not a
+reliable approach. Instead, knowledge of both AoA and AoD,
+and of the actual environment, was needed to identify such
+independent propagation paths. Additionally, due to smallscale movements of a user or non-ideal beam training, the
+transmitter and the receiver may not be perfectly aligned. In
+Sec. IV-B we therefore present an analysis of the effects of
+beam misalignment at transmitter and receiver on achievable
+data rates of the mm-wave link opportunities revealed by our
+measurements.
+B. Analysis of Beam Misalignment Effects
+In this section we study the effect of beam misalignment
+on the link performance in outdoor mm-wave networks, using
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+1
+2
+3
+4
+T (Gbps)
+(a) Scenario 1Ah: TX1, RX location A, horn antenna.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+1
+2
+3
+4
+T (Gbps)
+(b) Scenario 1Aa: TX1, RX location A, phased antenna array.
+Fig. 11: Estimated data rate versus RX orientation for
+scenario 1A (assuming optimal TX orientation).
+the estimated achievable data rate as calculated from (9) as
+the performance metric. We emphasize that considering the
+achievable data rate rather than solely RSS measurements
+(as in Sec. IV-A) allows us to better understand and assess
+the networking consequences of misaligned beams, especially
+with regard to higher system layers that need to cope with
+the resulting changes in the achievable PHY data rate. To
+illustrate this, in Fig. 11 we show the heatmap of estimated
+data rate versus RX orientation for RX location A (cf. Fig. 7a
+and Fig. 8a for the corresponding RSS versus RX orientation
+heatmaps). From the heatmap in Fig. 11b, it is evident that a
+phased antenna array beam misalignment of a few degrees in
+the azimuth can result in a dramatic loss in data rate.
+In real mm-wave outdoor deployments such beam misalignments can occur for several reasons. Fig. 12 illustrates several
+typical scenarios, where we consider the BS to be the transmitter and the UE to be the receiver, i.e. the downlink. After
+successful initial beam training, the BS and UE are ideally
+perfectly aligned. However, imperfect beam training due to
+e.g. stale beam training data or ambiguous information about
+independent propagation paths (as described in Sec. IV-A)
+may result in beam misalignments. Such beam misalignments
+can occur at the BS and at the UE as shown in Fig. 12a.
+Additionally, a UE beam misalignment may be caused by a
+rotation of the device, as illustrated in Fig. 12b. Fig. 12c shows
+how a small-scale lateral movement of the UE out of the BS’s
+beam causes a beam misalignment at both BS and UE. The UE
+may then readjust its beam orientation to try and mitigate the
+effects of the BS beam misalignment, as illustrated in Fig. 12d.
+In the following, we analyze how these beam misalignment
+scenarios affect the estimated achievable data rate based on
+our measured RSS data. We note that even though we focus
+our analysis on the downlink scenario, the general causes for
+beam misalignment as shown in Fig. 12 are the same for the
+uplink case.
+1) BS Beam Misalignment Analysis: After initial beam
+training, mobile users in a mm-wave network can cause a BS
+beam misalignment for example by physically moving out of
+the BS’s beam (cf. Fig. 12c). Similarly, imperfect beam train-
+11
+UE
+BS
+(a) BS and/or UE beam
+misaligned due to imperfect
+beam training.
+UE
+BS
+(b) UE beam misaligned after
+rotation.
+UE
+dmove
+BS
+(c) BS and UE beams
+misaligned after small-scale
+lateral movement dmove of
+UE.
+UE dmove
+BS
+(d) BS beam misaligned after
+small-scale lateral movement of
+UE; UE locally adjusted its
+beam to new optimal
+orientation.
+Fig. 12: Scenarios illustrating potential beam misalignments
+at BS and UE.
+ing may result in a BS beam misalignment (cf. Fig. 12a). In
+this section, we study the residual loss in estimated achievable
+data rate for such BS beam misalignments, assuming that the
+UE locally adjusts its orientation dynamically to mitigate the
+BS beam misalignment effects (cf. Figs. 12a and 12d). Namely,
+we consider
+T(∆T X) = max
+φRX,θRX
+T(∆T X, φRX, θRX), (12)
+where ∆T X is the beam misalignment with respect to the best
+possible BS orientation φT X,best, i.e.
+∆T X = φT X − φT X,best, (13)
+φT X,best = arg max T(φT X, φRX, θRX). (14)
+We neglect the elevation misalignment based on the assumption that all UEs are in the same plane, such that the BS’s
+elevation beam misalignment is negligible as compared to the
+BS’s elevation HPBW of 36◦
+. We note that the best possible
+BS orientation corresponds to LOS links for the scenarios 1A,
+1C, and 2D, and to NLOS links for the scenarios 1B and 2B.
+In Fig. 13 we show the estimated achievable data rate T
+of a link over the BS (TX) beam misalignment ∆T X with
+respect to the best possible BS orientation φT X,best. Based
+on Figs. 13a–13b we make three observations about beam
+misalignment for our phased antenna array setup. First, we
+observe that the maximum data rate is only achieved without
+beam misalignment, i.e. there is only one maximum peak.
+Second, small beam misalignments in the order of the HPBW
+cause significant losses in data rate of up to 70%. For instance,
+a beam misalignment of −7
+◦
+in scenario 1A produces a drop
+from 4 Gbps to 1.4 Gbps and from 2.6 Gbps to 0.8 Gbps
+in scenario 2D. Third, the loss in data rate is not increasing
+monotonically with increasing beam misalignment. Overall,
+−80 −60 −40 −20 0 20 40 60 80
+0
+1
+2
+3
+4
+TX antenna beam misalignment ∆T X (
+◦
+)
+T (Gbps)
+1A 1B 1C
+(a) Phased antenna array results for TX1.
+−80 −60 −40 −20 0 20 40 60 80
+0
+1
+2
+3
+4
+TX antenna beam misalignment ∆T X (
+◦
+)
+T (Gbps)
+2B 2D
+(b) Phased antenna array results for TX2.
+−80 −60 −40 −20 0 20 40 60 80
+0
+1
+2
+3
+4
+TX antenna beam misalignment ∆T X (
+◦
+)
+T (Gbps)
+1A 1B 1C
+(c) Horn antenna results.
+Fig. 13: The estimated data rate T versus the BS (TX) beam
+misalignment ∆T X with respect to the best possible link
+(assuming optimal φRX, θRX).
+the results in Figs. 13a–13b demonstrate that a UE locally
+adjusting its orientation is not sufficient to fully mitigate the
+effects of BS beam misalignment. Consequently, strategies for
+tracking UE movement at the BS are required to maintain
+high data rates. Moreover, given the observed non-monotonic
+relationship between beam misalignment and loss in data rate,
+we expect that some types of beam tracking algorithms will not
+work reliably. For instance, let us consider an RSS-gradientfollowing beam tracking approach, i.e. an algorithm that tries
+to find the ideal beam orientation by adapting the beam
+orientation of its phased antenna array beam to a neighboring
+orientation that achieves a higher RSS. Due to the observed
+irregular variation of the achievable data rate over increasing
+beam misalignment, it would not be able to find the global
+optimal orientation.
+In Fig. 13c, we present the estimated maximum data rate
+over the horn antenna BS beam misalignment for comparison
+with the phased antenna array results. We observe that the data
+rates decrease monotonically with increasing misalignment
+which is in contrast to the observations made in Figs. 13a–13b
+for the phased antenna array. We emphasize that this stark
+dissimilarity between the results for the antenna types indicates
+12
+0 50 100 150
+−100
+−80
+−60
+−40
+−20
+0
+RX antenna beam misalignment ∆RX (
+◦
+)
+Loss in
+T (%)
+Array
+Horn
+(a) Measurement 1A.
+0 50 100 150
+−100
+−80
+−60
+−40
+−20
+0
+RX antenna beam misalignment ∆RX (
+◦
+)
+Loss in
+T (%)
+Array
+Horn
+(b) Measurement 1B.
+0 50 100 150
+−100
+−80
+−60
+−40
+−20
+0
+RX antenna beam misalignment ∆RX (
+◦
+)
+Loss in
+T (%)
+Array
+Horn
+(c) Measurement 1C.
+0 50 100 150
+−100
+−80
+−60
+−40
+−20
+0
+RX antenna beam misalignment ∆RX (
+◦
+)
+Loss in
+T (%)
+Array
+(d) Measurement 2B.
+0 50 100 150
+−100
+−80
+−60
+−40
+−20
+0
+RX antenna beam misalignment ∆RX (
+◦
+)
+Loss in
+T (%)
+Array
+(e) Measurement 2D.
+Fig. 14: Loss in estimated data rate T versus UE (RX) beam
+misalignment ∆RX with respect to the best possible link
+(assuming optimal φT X).
+that we cannot simply infer the impact of beam misalignments
+on mm-wave links based on measurements taken with horn
+antennas as in e.g. [6], [12] or calculations based on simplistic
+directional antenna radiation pattern models as in e.g. [23].
+Instead, realistic phased antenna array radiation patterns have
+to be explicitly taken into account in the design of beam
+training and tracking algorithms.
+2) UE Beam Misalignment Analysis: In Figs. 12b–12c we
+illustrated how a rotation or small-scale movement of the UE
+may result in a UE beam misalignment. Similarly, imperfect
+beam training as shown in Fig. 12a may lead to a UE beam
+misalignment. In this section, we study the effects of such UE
+beam misalignments, assuming that the BS locally adjusts its
+orientation dynamically to mitigate the UE beam misalignment
+effects. We thus apply the same principle of considering onesided misalignment only, as in the previous analysis of the BS
+-30 0 30 60
+0
+1
+2
+3
+4
+RX elevation angle θRX (
+◦
+)
+T (Gbps)
+1A
+1B
+1C
+2B
+2D
+Fig. 15: Boxplots of the estimated data rate T that can be
+achieved with the phased antenna array over all UE azimuth
+angles φRX with a fixed UE elevation angle θRX
+(assuming optimal φT X).
+beam misalignment. Namely, we consider
+T(∆RX) = max
+φT X
+T(φT X, ∆RX). (15)
+where ∆RX is the beam misalignment with respect to the best
+possible UE orientation (φRX,best, θRX,best) comprising both
+the azimuth and elevation misalignment, i.e.
+∆RX =
+q
+(φRX − φRX,best)
+2 + (θRX − θRX,best)
+2
+, (16)
+(φRX,best, θRX,best) = arg max T(φT X, φRX, θRX). (17)
+In Fig. 14 we present the loss in estimated data rate T for
+a UE (RX) antenna beam misalignment ∆RX with respect to
+the best possible UE orientation. Figs. 14a–14c show results
+for both measurement setups, where we again observe that
+a misalignment causes a gradual loss in data rate for the
+horn antenna results, whereas the phased antenna array results
+vary rather irregularly. This confirms that we cannot simply
+infer the impact of beam misalignments on mm-wave links
+based on measurements taken with horn antennas. Moreover,
+in Figs. 14a–14e we find that a small misalignment of the UE
+phased antenna array beam of up to 8◦
+results in losses of
+data rate between 6–60%. This demonstrates that even with
+perfect UE tracking, agile beamsteering at the UE is needed
+to compensate residual losses in data rate due to misalignment.
+One key to enabling mm-wave networks is to successfully
+integrate UE phased antenna arrays that can reliably maintain a
+connection over all 3D orientations. As described in Sec. III-A,
+the phased antenna array used in our measurements only
+allows azimuth beamsteering while having a wide elevation
+HPBW of 36◦
+. To investigate if this is a suitable configuration
+for a mm-wave UE, we isolate the effect of the UE elevation
+angle on estimated data rates. We expect that the best data rate
+would be achieved for the measured elevation angles θRX that
+are closest to the ideal elevation orientation towards the BS,
+which can be computed from the distances between BS and UE
+(cf. Table I). Namely, we expect the scenarios 1A and 2D to
+achieve approximately equal maximum estimated achievable
+data rate for θRX = 0
+◦
+and θRX = 30◦
+, as the distances
+between BS and UE was the shortest in these cases, implying
+a greater elevation angle. For larger distances between BS and
+UE, the ideal elevation angle is smaller and we expect to see
+the maximum estimated achievable data rate for the scenarios
+1B, 1C, and 2B at θRX = 0
+◦
+.
+13
+Fig. 15 shows boxplots of the estimated data rate T over all
+azimuth angles φRX ∈ [−180◦
+, 180◦
+] for UE elevation angle
+θRX, i.e. we consider
+T(θRX) = max
+φT X
+T(φT X, φRX, θRX). (18)
+We observe a drop in maximum estimated data rate for all
+results except 1A when the elevation angle is not equal to 0◦
+.
+This is expected, except for the result 2D which shows an
+outlier achieving around 2.6 Gbps for θRX = 0
+◦
+. This may be
+due to the tree foliage that blocked the LOS between TX and
+RX (cf. Fig. 2i). Overall, despite the large HPBW of the phased
+antenna array pattern in the elevation plane of 36◦
+, the loss in
+the maximum achievable estimated data rate ranges between
+26% and 70% for a change in elevation angle θRX from 0◦
+to 60◦ over all results presented in Fig. 15. Therefore, we
+conclude that 2D beamsteering will not be sufficient to fully
+exploit available UE link opportunities in a 3D environment.
+3) Two-sided Beam Misalignment Analysis: In the previous
+sections, we treated the effects of BS and UE beam misalignment separately. However, in real outdoor mm-wave network
+deployments, a misalignment at both BS and UE is likely to
+occur simultaneously (cf. Fig. 12). We now study this case
+for the phased antenna array results, i.e. the beamsteering
+opportunities at the UE for a given BS beam misalignment.
+To this end, in Figs. 16-17 we show the estimated data rate T
+over UE (RX) azimuth angles φRX for selected measurement
+scenarios and for selected representative BS (TX) orientations
+φT X. In Figs. 16-17 we only consider the UE elevation angle
+θRX = 0
+◦
+, which was observed to achieve the highest data
+rates over all elevation angles (cf. Fig. 15).
+In Fig. 16 the BS orientations φT X were selected to study the
+effects of small-scale misalignment in the order of the HPBW
+of around 6
+◦
+. From Fig. 16 it is evident that the UE achieves
+the highest estimated data rate and has the maximum number
+of viable orientations when the transmitter is well aligned, i.e.
+φT X = 0
+◦ or φT X = ±3
+◦
+. A small-scale misalignment of the
+transmitter of ±7
+◦
+to ±10◦ produces a significant decrease
+in the maximum estimated data rate of up to 54%. For a
+misalignment in the order of ±7
+◦
+at both BS and UE, the
+loss in estimated data rate is 38%–100% with a median of
+70% across all our results. Overall, we conclude that the
+joint effect of small-scale beam misalignment at BS and UE
+results in severe losses in data rate, placing the burden on agile
+beamtracking algorithms to update BS and UE orientation at
+a sufficient rate to ensure robustness of high data rate links
+for mobile users.
+In Fig. 17 the BS orientations φT X were selected to study
+link opportunities that occur due to sidelobes or independent
+secondary propagation paths, i.e. at orientations that deviate
+at large-scale from the best orientation. In Fig. 17a, for
+φT X = 30◦
+the overall estimated data rates are below those
+for φT X = 0
+◦
+, but the shape of the curve is similar. This
+suggests that the transmitter has a sidelobe towards the receiver
+when oriented at φT X = 30◦
+, using the same propagation path
+as for φT X = 0
+◦
+. By contrast, we observe an independent
+secondary (NLOS) propagation path for φRX = −84◦
+and
+φT X = 41◦ which was also traced on the environment map
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+−7
+◦
+0
+◦
+7
+◦
+(a) Measurement 1A.
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+−7
+◦
+0
+◦
+7
+◦
+(b) Measurement 1B.
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+−10◦
+−3
+◦
+3
+◦
+10◦
+(c) Measurement 2B.
+Fig. 16: Estimated data rate T versus RX azimuth angles
+φRX for selected measurements and selected fixed BS
+orientations φT X, representative of small-scale BS beam
+misalignment (θRX = 0
+◦
+assumed throughout).
+of the study area (cf. Fig. 10a). Fig. 17b reveals the same
+trend. The φRX-dependent link opportunities for φT X = −37◦
+are similar to those for φT X = 3
+◦
+, suggesting that they
+resulted from a sidelobe of the transmitter. For φT X = −29◦
+,
+a distinct signal path with a receiver orientation of φRX = 35◦
+yields the highest estimated data rate (cf. Fig. 10a for the
+map of the study area). Finally, in Fig. 17c two independent
+secondary propagation paths for φT X = −33◦
+and φT X = 17◦
+are observed. Based on the results in Fig. 17, we conclude
+that identifying an independent secondary propagation path
+between BS and UE solely based on measured data rates or
+signal quality over either AoD or AoA data is very difficult,
+as sidelobes may also allow good data rates using the primary
+signal path. An approach of combining information from BS,
+UE, and external sources such as motion sensors or other
+environmental awareness, e.g. [35], [36], may therefore be
+needed to identify independent secondary propagation paths
+that can be used to overcome blockage which may occur on
+the primary path.
+V. DISCUSSION
+Our mm-wave measurements in a German town center
+showed a limited number of 2–4 multipath clusters per receiver
+position, which is similar to the results reported for dense
+urban areas in modern metropolises [3]–[6]. This stands in
+contrast to expectations that the differences in building types
+14
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+0
+◦
+30◦
+41◦
+(a) Measurement 1A.
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+−37◦
+−29◦
+3
+◦
+(b) Measurement 1C.
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+−33◦
+0
+◦
+17◦
+(c) Measurement 2D.
+Fig. 17: Estimated data rate T versus RX azimuth angles
+φRX for selected measurements and selected fixed BS
+orientations φT X, representative of large-scale BS beam
+misalignment (θRX = 0
+◦
+assumed throughout).
+and layout between a typical European town and dense urban
+areas in modern metropolises would have an effect on the
+number of mm-wave multipath clusters. Our results thus
+suggest that it is possible to cover such small cities with
+mm-wave Gbps-networks at limited infrastructure cost, as the
+area of such city centers is rather small and suitable base
+station sites are, thanks to the building structure, easier to
+find than in more metropolitan areas. This suggests that mmwave phased antenna arrays and mm-wave massive MIMOtype deployments are an attractive approach to achieve Gbps
+data rates in such environments.
+However, looking more closely at the structure of the
+received multipath clusters, we observe the paradigm shift
+that occurs when moving from horn antennas to real phased
+antenna arrays. The clusters exhibit a smooth structure when
+measured with the horn antenna which has a radiation pattern
+without strong sidelobes or nulls, thereby giving a good indication of the actual underlying physical propagation paths. The
+same physical propagation paths are perceived very differently
+with the phased antenna array: the clusters appear irregular.
+This is a consequence of the real phased antenna array which
+has a non-ideal radiation pattern with significant sidelobes and
+nulls, as shown in Figs. 3c–3d. We also note that such strong
+sidelobes in the radiation pattern may result in significant intracell interference, which will have to be carefully considered
+during mm-wave network system design. Yet, this fact has
+been given only very little attention in the existing literature.
+As observed throughout this paper, the antenna radiation
+pattern plays a similarly crucial role in the effects of mm-wave
+beam misalignment. Our measurements with horn antennas
+show a monotonic relationship between misalignment and
+loss in received power, as also presented in earlier studies
+[6], [12]. By contrast, this does not hold for our phased
+antenna array results. For azimuth beam misalignments larger
+than the HPBW the degradation of estimated data rate is not
+monotonic with increasing beam misalignment for the nonideal, phased antenna array radiation pattern. Instead, it varies
+irregularly with increasing beam misalignment. Consequently,
+measurement results obtained with horn antennas cannot simply be generalized to also hold for phased antenna arrays when
+investigating the effect of beam misalignment on the expected
+performance of real mm-wave networks. Similar implications
+hold for the theoretical works that make use of simplistic
+idealized antenna patterns, e.g. [22], [23].
+Our results also showed that a small-scale beam misalignment at one station, i.e. either at BS or UE, caused a significant
+loss in estimated data rate that cannot be mitigated fully by
+the other station. We expect such a one-sided misalignment
+to be particularly harmful in uplink situations. As mm-wave
+UEs will likely not be able to feature phased antenna arrays of
+the same size as BSs, their antenna gain will be more limited
+due to the smaller number of antenna elements. Moreover,
+due to the limited battery capacity of the UE, also its output
+power will be more limited than the BS’s output power. While
+the link performance could still be acceptable under beam
+misalignment when the BS transmits with high EIRP, this may
+not be the case under beam misalignments in uplink scenarios,
+where the UE EIRP is likely to be significantly lower. Thus, we
+expect to see a large asymmetry between uplink and downlink
+performance in mm-wave networks. Overall, we conclude that
+both the BS and UE in mm-wave networks will need to
+frequently adjust their orientation to counteract even one-sided
+small-scale beam misalignments.
+Furthermore, we note that one of the key challenges for enabling mm-wave outdoor networks is the handling of dynamic
+blockages by using an independent secondary unblocked signal path, as e.g. pedestrian blockage typically only concerns
+one multipath cluster and other multipath clusters remain
+unaffected [7]. However, due to the strength of sidelobes
+in non-ideal, phased antenna array radiation patterns, our
+results suggest that it may be difficult to distinguish between
+a true independent secondary propagation path and a link
+opportunity due to a sidelobe. This distinction is crucial, as
+link opportunities due to sidelobes on the primary propagation
+path are also affected by blockage of the primary propagation
+path. Beamsteering algorithms that obtain a list of viable
+link opportunities based on a simple RSSI search, e.g. IEEE
+802.11ad-like algorithms [37], are thus expected to suffer from
+this ambiguity if they do not restart at least a partial beam
+search upon link blockage.
+Finally, our analysis suggest that, despite the wide elevation
+HPBW of our phased antenna array of 36◦
+, 2D beamsteering
+is not sufficient to fully exploit available link opportunities at
+certain receiver positions. These results agree with the findings
+in [38] where it was demonstrated that 3D rotations can result
+15
+in strong link degradations. This is particularly relevant as
+many beamsteering algorithms proposed in the literature only
+consider the planar case [38]. We expect that 3D beamsteering
+and hand-grip aware beamcombining [39] will be required to
+maintain a high data rate under rotation of the user device
+and different user activities. Despite the already increasing
+complexity of 5G-and-beyond protocol design, even additional
+external information, location-based environmental awareness,
+shared beamsteering information from devices in direct vicinity of a UE, or local data from a motion tracking sensor may
+further enhance the robustness and seamless coverage of mmwave deployments under user mobility.
+VI. CONCLUSIONS
+We presented the results of the first comprehensive largescale outdoor mm-wave measurement study using a stateof-the-art phased antenna array in a European town. The
+data obtained over more than 5,000 systematic fine-grained
+AoA/AoD combinations per TX/RX pair was analyzed with
+respect to the number of available link opportunities and the
+effect of beam misalignment at the receiver and transmitter
+on the estimated mm-wave link data rate, and compared to
+reference measurements taken with a horn antenna. Our results
+show a limited number of 2–4 available multipath clusters
+per receiver location, indicating that the mm-wave multipath
+richness in a European town is surprisingly similar to that in
+dense urban metropolises as presented in prior literature. The
+results for the phased antenna array reveal that losses in the
+estimated data rate of up to 70% occurred for small beam
+misalignments in the order of the HPBW, with significant
+and irregular variations in the estimated data rate for larger
+beam misalignments, caused by the non-ideal, phased antenna
+array radiation pattern. This stands in stark contrast to the horn
+antenna reference measurements, where the loss in estimated
+data rate was observed to be monotonically increasing with
+the misalignment error. Moreover, our results suggest that the
+characteristics of non-ideal, phased antenna array radiation
+patterns should be explicitly considered during the design and
+testing of mm-wave beamsteering algorithms. To this end, our
+ongoing work is focused on conducting further measurements
+in more diverse urban scenarios, explicitly studying the performance of beamsteering and beamtracking algorithms based
+on data obtained with real mm-wave phased antenna arrays.
+REFERENCES
+[1] T. S. Rappaport, S. Sun, R. Mayzus, H. Zhao, Y. Azar, K. Wang, G. N.
+Wong, J. K. Schulz, M. Samimi, and F. Gutierrez, “Millimeter wave
+mobile communications for 5G cellular: It will work!” IEEE Access,
+2013.
+[2] M. Xiao, S. Mumtaz, Y. Huang, L. Dai, Y. Li, M. Matthaiou, G. K.
+Karagiannidis, E. Björnson, K. Yang, C. I, and A. Ghosh, “Millimeter
+wave communications for future mobile networks,” IEEE J. Sel. Areas
+Commun., vol. 35, no. 9, pp. 1909–1935, Sep. 2017.
+[3] T. S. Rappaport, G. R. MacCartney, M. K. Samimi, and S. Sun, “Wideband millimeter-wave propagation measurements and channel models for
+future wireless communication system design,” IEEE Trans. Commun.,
+vol. 63, no. 9, pp. 3029–3056, Sep. 2015.
+[4] M. Samimi, K. Wang, Y. Azar, G. N. Wong, R. Mayzus, H. Zhao,
+J. K. Schulz, S. Sun, F. Gutierrez, and T. S. Rappaport, “28 GHz
+angle of arrival and angle of departure analysis for outdoor cellular
+communications using steerable beam antennas in New York City,” in
+Proc. IEEE VTC, Jun. 2013.
+[5] S. Hur, Y. J. Cho, T. Kim, J. Park, A. F. Molisch, K. Haneda,
+and M. Peter, “Wideband spatial channel model in an urban cellular
+environments at 28 GHz,” in Proc. IEEE EuCAP, May 2015.
+[6] L. Simic, N. Perpinias, and M. Petrova, “60 GHz outdoor urban ´
+measurement study of the feasibility of multi-Gbps mm-wave cellular
+networks,” in Proc. IEEE INFOCOM Workshops, Apr. 2016.
+[7] R. J. Weiler, M. Peter, W. Keusgen, and M. Wisotzki, “Measuring
+the busy urban 60 GHz outdoor access radio channel,” in Proc. IEEE
+ICUWB, Sep. 2014.
+[8] S. Rajagopal, S. Abu-Surra, and M. Malmirchegini, “Channel feasibility
+for outdoor non-line-of-sight mmwave mobile communication,” in Proc.
+IEEE VTC, Sep. 2012.
+[9] J. Ko, Y. Cho, S. Hur, T. Kim, J. Park, A. F. Molisch, K. Haneda,
+M. Peter, D. Park, and D. Cho, “Millimeter-wave channel measurements
+and analysis for statistical spatial channel model in in-building and urban
+environments at 28 GHz,” IEEE Transactions on Wireless Communications, vol. 16, no. 9, pp. 5853–5868, Sep. 2017.
+[10] T. S. Rappaport, Y. Xing, G. R. MacCartney, A. F. Molisch, E. Mellios,
+and J. Zhang, “Overview of millimeter wave communications for fifthgeneration (5G) wireless networks-with a focus on propagation models,”
+IEEE Trans. Antennas Propag., vol. 65, no. 12, pp. 6213–6230, Dec.
+2017.
+[11] S. Segan. (2019) Here’s the real truth about Verizon’s 5G network. PC
+Mag Digital Group. [Online]. Available: https://www.pcmag.com/news/
+367659/heres-the-real-truth-about-verizons-5g-network
+[12] J. Lee, M.-D. Kim, J.-J. Park, and Y. J. Chong, “Field-measurementbased received power analysis for directional beamforming millimeterwave systems: Effects of beamwidth and beam misalignment,” ETRI
+Journal, vol. 40, no. 1, pp. 26–38, 2018.
+[13] H. Zhao, R. Mayzus, S. Sun, M. Samimi, J. K. Schulz, Y. Azar, K. Wang,
+G. N. Wong, F. Gutierrez, and T. S. Rappaport, “28 GHz millimeter wave
+cellular communication measurements for reflection and penetration loss
+in and around buildings in New York City,” in Proc. IEEE ICC, June
+2013.
+[14] V. Raghavan, L. Akhoondzadeh-Asl, V. Podshivalov, J. Hulten, M. A.
+Tassoudji, O. H. Koymen, A. Sampath, and J. Li, “Statistical blockage
+modeling and robustness of beamforming in millimeter-wave systems,”
+IEEE Trans. Microw. Theory Tech., vol. 67, no. 7, pp. 3010–3024, July
+2019.
+[15] B. Sadhu, A. Paidimarri, M. Ferriss, M. Yeck, X. Gu, and A. ValdesGarcia, “A 128-element dual-polarized software-defined phased array
+radio for mm-wave 5G experimentation,” in Proc. ACM mmNets Workshop, New Delhi, India, 2018.
+[16] I. Aziz, R. Dahlbäck, E. Öjefors, A. Rydberg, and D. Dancila, “High
+Gain Compact 57-66 GHz Antenna Array for Backhaul & Access
+Communications,” in Proc. IEEE EuCAP, Apr. 2018.
+[17] F. Aryanfar, J. Pi, H. Zhou, T. Henige, G. Xu, S. Abu-Surra, D. Psychoudakis, and F. Khan, “Millimeter-wave base station for mobile
+broadband communication,” in Proc. IEEE MTT-S IMS, May 2015.
+[18] V. Raghavan, A. Partyka, A. Sampath, S. Subramanian, O. H. Koymen,
+K. Ravid, J. Cezanne, K. Mukkavilli, and J. Li, “Millimeter-wave MIMO
+prototype: Measurements and experimental results,” IEEE Commun.
+Mag., vol. 56, no. 1, pp. 202–209, Jan 2018.
+[19] W. Roh, J. Y. Seol, J. Park, B. Lee, J. Lee, Y. Kim, J. Cho, K. Cheun, and
+F. Aryanfar, “Millimeter-wave beamforming as an enabling technology
+for 5G cellular communications: Theoretical feasibility and prototype
+results,” IEEE Commun. Mag., vol. 52, no. 2, pp. 106–113, Feb. 2014.
+[20] D. Kurita, D. Kitayama, K. Tateishi, A. Harada, Y. Kishiyama, S. Itoh,
+H. Murai, J. J. Fwu, X. J. Zhuang, K. Stewart, A. Simonsson, and
+P. Ökvist, “Outdoor experiments on 5G radio access using BS and UE
+beamforming in 28-GHz frequency band,” in Proc. IEEE CCNC, Jan.
+2019.
+[21] R. J. Weiler, W. Keusgen, A. Maltsev, T. Kühne, A. Pudeyev, Liang
+Xian, J. Kim, and M. Peter, “Millimeter-wave outdoor access shadowing
+mitigation using beamforming arrays,” in Proc. IEEE EuCAP, April
+2016.
+[22] A. Thornburg and R. W. Heath, “Ergodic capacity in mmWave ad hoc
+network with imperfect beam alignment,” in Proc. IEEE MILCOM, Oct.
+2015.
+[23] J. Wildman, P. H. J. Nardelli, M. Latva-aho, and S. Weber, “On the joint
+impact of beamwidth and orientation error on throughput in directional
+wireless poisson networks,” IEEE Trans. Wireless Commun., vol. 13,
+no. 12, pp. 7072–7085, Dec. 2014.
+[24] SiversIMA, “Product brief: TRX BF/01,” 2018. [Online]. Available: https://www.siversima.com/wp-content/uploads/PB_TRX-BF01_
+v1-02.pdf
+16
+[25] M. K. Samimi and T. S. Rappaport, “3-D millimeter-wave statistical
+channel model for 5G wireless system design,” IEEE Trans. Microw.
+Theory Tech., vol. 64, no. 7, pp. 2207–2225, Jul. 2016.
+[26] Land NRW, “TIM-online 2.0,” NRW, Germany, 2019. [Online].
+Available: https://www.tim-online.nrw.de/tim-online2/
+[27] ITU-R Resolution 238 (WRC-15), “Studies on frequency-related matters
+for International Mobile Telecommunications identification including
+possible additional allocations to the mobile services on a primary basis
+in portion(s) of the frequency range between 24.25 and 86 GHz for
+the future development of International Mobile Telecommunications for
+2020 and beyond.” 2015.
+[28] SiversIMA, “Product brief: EVK06002,” 2018. [Online]. Available: https://www.siversima.com/wp-content/uploads/PB_EVK-06002-
+00_1-02-1.pdf
+[29] ——, “Product brief: FC1005V/00 V-band converter with LO,”
+2017. [Online]. Available: https://www.siversima.com/wp-content/
+uploads/FC1005V00-Data-Sheet.pdf
+[30] Flann Microwave, “Product brief: Standard gain horns series 240,”
+2016. [Online]. Available: https://flann.com/wp-content/uploads/2016/
+01/Series-240.pdf
+[31] “Frequenzplan gemäß §54 TKG über die Aufteilung des Frequenzbereichs von 0 kHz bis 3000 GHz auf die Frequenznutzungen sowie über
+die Festlegungen für diese Frequenznutzungen,” BNetzA, Mar. 2018.
+[32] K. King. (2018, Sep.) Meanwhile, back in the lab, another 5G
+milestone – Verizon and Samsung reach multi-gigabit throughput
+over 5G NR and mmwave spectrum. [Online]. Available:
+https://www.verizon.com/about/news/meanwhile-back-lab-another-5gmilestone--verizon-and-samsung-reach-multi-gigabit-throughput
+[33] “LTE; evolved universal terrestrial radio access (E-UTRA); radio frequency (RF) system scenarios,” ETSI 3GPP, TR 36.942 version 14.0.0
+Release 14, Apr. 2017.
+[34] “Study on new radio access technology: Radio frequency (RF) and coexistence aspects,” ETSI 3GPP, TS 38.101-2 V14.2.0, Sep. 2017.
+[35] J. Arnold, L. Simic, and P. Mähönen, “Experimental feasibility study of ´
+motion sensor-aided mm-wave beam tracking,” in Proc. ACM mmNets
+Workshop, Snowbird, Utah, 2017.
+[36] L. Simic, J. Arnold, M. Petrova, and P. Mähönen, “RadMAC: radar- ´
+enabled link obstruction avoidance for agile mm-wave beamsteering,”
+in Proc. ACM HotWireless, 2016.
+[37] M. K. Haider and E. W. Knightly, “Mobility resilience and overhead
+constrained adaptation in directional 60 GHz WLANs: protocol design
+and system implementation,” in Proc. ACM MobiHoc, Paderborn, Germany, 2016.
+[38] A. Zhou, L. Wu, S. Xu, H. Ma, T. Wei, and X. Zhang, “Following the
+shadow: Agile 3-D beam-steering for 60 GHz wireless networks,” in
+Proc. IEEE INFOCOM, Apr. 2018.
+[39] A. Alammouri, J. Mo, B. L. Ng, J. C. Zhang, and J. G. Andrews, “Hand
+grip impact on 5G mmWave mobile devices,” IEEE Access, vol. 7, pp.
+60 532–60 544, 2019.

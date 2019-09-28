@@ -1,0 +1,23 @@
+Abstract—Exploiting multi-antenna technologies for robust
+beamsteering to overcome the effects of blockage and beam
+misalignment is the key to providing seamless multi-Gbps connectivity in 5G-and-beyond mm-wave networks. In this paper, we
+present the first large-scale outdoor mm-wave measurement study
+using a phased antenna array in a typical European town. We
+systematically collect fine-grained 3D angle-of-arrival and angleof-departure data, totaling over 50,000 received signal strength
+measurements. We study the impact of phased antenna arrays
+in terms of number of link opportunities, achievable data rate
+and robustness under small-scale mobility, and compare this
+against reference horn antenna measurements. Our results show
+a limited number of 2–4 link opportunities per receiver location,
+indicating that the mm-wave multipath richness in a European
+town is surprisingly similar to that of dense urban metropolises.
+The results for the phased antenna array reveal that significant
+losses in estimated data rate occur for beam misalignments in the
+order of the half-power beamwidth, with significant and irregular
+variations for larger misalignments. By contrast, the loss for the
+horn antenna is monotonically increasing with the misalignment.
+Our results strongly suggest that the effect of non-ideal phased
+antenna arrays must be explicitly considered in the design of
+agile beamsteering algorithms.
+Index Terms—Millimeter wave, phased antenna array, beam
+misalignment, multipath propagation, urban deployments.

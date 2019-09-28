@@ -1,0 +1,933 @@
+2019 marks the year for 5G, which was eventually rolled
+out for commercial services to consumers. Compared to 4G
+LTE, 5G offers significantly higher bandwidth, lower latency,
+and better scalability (i.e., supporting more devices). The
+mainstream 5G deployment employs the millimeter wave
+(mmWave) technology that can provide, in theory, a through-
+put of up to 20 Gbps – a 100× improvement compared to
+today’s 4G, as well as <1ms latency [29]. Under the hood,
+this is achieved by a series of innovations including massive
+MIMO, advanced channel coding, and scalable modulation.
+5G is expected to fuel a wide range of applications that
+cannot be well supported by 4G, such as ultra-HD (UHD)
+video streaming, networked VR/AR, low-latency cloud gam-
+ing, IoT, and vehicle-to-everything (V2X) communication.
+Despite these potentials, commercial 5G services are at their
+infancy. In April 2019, Verizon launched 5G in Chicago and
+Minneapolis. It uses a 400 MHz channel at 28 GHz, making
+it the world’s first commercial mmWave 5G service for con-
+sumers. Most major carriers around the world are rolling out
+5G this year or in the process of expanding their footprint
+to more cities.
+In this paper, we conduct to our knowledge a first mea-
+surement study of commercial mmWave 5G networks on
+smartphones. We travel to Verizon ’s 5G coverage areas at the
+two cities and conduct detailed measurements of Verizon ’s
+mmWave 5G networks. We compare the performance of
+5G and 4G on key metrics such as throughput, latency, and
+packet loss rate. Since mmWave signals are vulnerable to ob-
+struction and attenuation, we conduct our experiments under
+diverse scenarios with different distances/orientations be-
+tween the smartphone and the 5G-NR (New Radio) panel, and
+obstruction levels. Furthermore, we study other important
+aspects such as 4G/5G handoffs, application performance,
+and many of whose characteristics are quite different from
+those of 4G. Our two-month experiments consume 10 TB 5G
+traffic and 1 TB 4G traffic 1 . We summarize our key findings
+as follows.
+• 5G offers much higher throughput than 4G (median through-
+put: 1520 vs. 147 Mbps). However, even under clear line-of-
+sight, 5G throughput exhibits much higher variation than
+4G, mainly due to the PHY-layer nature of 5G signals (§4.1).
+• Verizon very likely imposes a per-TCP-connection throt-
+tling on 5G traffic. This may hurt the performance of single-
+connection protocols such as HTTP/2. Due to its non-standalone
+deployment (§2), Verizon ’s 5G offers little improvement of
+the end-to-end PING RTT over 4G. However, the bufferbloat
+becomes less severe likely because of 5G’s high speed (§4.1).
+• 5G performance may be affected by obstruction, distance,
+and device-tower orientation. Among these factors, obstruc-
+tion typically incurs the highest impact. We find that 5G
+signals can be easily blocked by hands and human body. De-
+spite that, in urban environments, surrounding signal reflec-
+tions can oftentimes mitigate the performance degradation,
+allowing 5G to function under non-line-of-sight (§4.2).
+• 4G-5G handoffs can be triggered by either network con-
+dition change or user traffic. Even under low mobility (e.g.,
+walking), a smartphone may experience 31 4G/5G handoffs
+in less than 8 minutes. Due to the discrepancy between 4G
+and 5G, frequently switching between them may confuse ap-
+plications (e.g., video rate adaptation logic) and bring highly
+inconsistent user experiences (§4.3).
+• For web browsing, 5G brings little page load time reduction
+for most small web pages compared to 4G. For large HTTP(S)
+1 We
+purchased multiple unlimited 5G data plans from Verizon for this
+study. Our study conforms to Verizon’s wireless customer agreement.download, the goodput is significantly lower than the avail-
+able 5G bandwidth, because many cross-layer factors may
+potentially slow down the download (§4.4).
+At a high level, we find that despite its high throughput,
+today’s 5G has several limitations such as large performance
+variations, vulnerability to obstructions, and frequent hand-
+offs even during low mobility. We also experimentally show
+that 5G’s high throughput does not always translate to bet-
+ter app QoE, whose improvement requires joint, cross-layer
+optimizations from multiple players in the mobile ecosystem.
+We make the following contributions in this paper.
+• We develop practical and sound measurement methodolo-
+gies for mmWave 5G networks on COTS smartphones.
+• We present timely measurement findings of mmWave 5G
+performance on smartphones with key insights. As our ex-
+periments were conducted when commercial 5G had just
+made its debut, our results provide an important “baseline”
+for studying how 5G performance evolves.
+• We intend to release our measurement data to the research
+community to benefit work that needs real 5G data.
+2
+as crowd-sourced measurements of 3G [16, 35], LTE perfor-
+mance characterization using ISP data [15], studies of cellular
+network configurations [6], cellular performance under high
+mobility [20], using cellular to support emerging applica-
+tions such as VR [38], and measurement tools [21], to name
+just a few. None of the above work studies 5G networks that
+have been very recently commercialized.
+3
+MEASUREMENT METHODOLOGY
+5G Networks. All our experiments were conducted over
+Verizon ’s 5G network. As of June 2019, Verizon is the only
+cellular carrier in the U.S. that offers commercial mmWave-
+based 5G services to consumers at specific downtown areas
+in two cities: Minneapolis and Chicago. In both cities’ 5G
+coverage areas, dense 5G base stations are deployed. Due
+to Verizon ’s adoption of NSA (§2), 5G base stations are typi-
+cally co-located with or very close to those of 4G (based on
+our knowledge and visual inspection). A 5G base station is
+typically equipped with two panels that are the mmWave
+transceivers. We observe that the panels typically face popu-
+lated areas such as streets and pedestrian walkways.
+5G User Equipment (UE). We use two types of COTS
+5G-capable smartphones: Motorola Moto Z3 and Samsung
+Galaxy S10 5G (SM-G977U), henceforth referred to as MZ3
+and SGS10, respectively. They are the only two types of
+commercially available 5G smartphones from Verizon as of
+mid-June 2019. SGS10 has a built-in 5G radio, while MZ3 re-
+quires a separate accessory called 5G Mod [23] for accessing
+5G. Comparing their performance at same locations, we find
+that MZ3 significantly underperforms SGS10 in terms of 5G
+throughput, likely due to hardware issues of MZ3 or its 5G
+mod. To further ensure that our experiments are not affected
+by device artifacts, we purchase two SGS10 and confirm that
+they exhibit similar 5G performance. Our experience indi-
+cates the importance of selecting proper devices for studying
+emerging wireless technologies such as 5G. Thus, unless oth-
+erwise mentioned, all 5G results presented in the paper are
+from SGS10. We confirm that despite 5G’s high throughput,
+the device-side processing is not a bottleneck. In some ex-
+periments, we also employ a Samsung Galaxy S9 (SGS9) over
+4G for 4G-5G comparison. We use SGS9 because we are not
+able to manually switch between 5G and 4G on SGS10.
+Experiment Sites. We conduct experiments at 4 loca-
+tions (A, B, C, and D). A is a popular downtown area in
+Minneapolis with many buildings. B is at the boundary of
+the 5G coverage area in downtown Minneapolis. C is inside
+a hotel room in downtown Chicago where we stand near an
+open window. D is near the U.S. bank stadium in Minneapolis
+with large open space. We believe that these 4 locations are
+representative in terms of their environment (open/crowded
+space, low/high surrounding buildings, indoor/outdoor, etc.).
+BACKGROUND AND RELATED WORK
+mmWave is an innovative technology integrated into 5G.
+Unlike 3G/4G that works at ≤5 GHz, mmWave radios oper-
+ate at much higher frequencies of 30 to 300 GHz. Despite its
+high bandwidth, mmWave’s short wavelength makes its sig-
+nals vulnerable to attenuation. To overcome this, mmWave
+transceivers have to use phased-array antennas to form
+highly directional beams. Due to the pseudo-optical nature
+of a beam, the signals are sensitive to blockages such as a
+pedestrian or a moving vehicle. Switching from line-of-sight
+(LoS) to none-line-of-sight (NLoS) due to blockage may cause
+significant data rate drop or even complete blackout despite
+the beamforming algorithm that attempts to “recalibrate” the
+beams by seeking for a reflective NLoS path [26, 36].
+Researchers have demonstrated the feasibility of deploy-
+ing mmWave in data centers [12, 44, 46], indoor [1, 2, 5, 11,
+25, 37, 39, 41], and outdoor environments [28, 31–33, 43, 45],
+as well as have conducted many studies on beamforming and
+beam tracking [8, 27, 34]. But none of them studies mmWave
+in commercial 5G context on smartphones.
+5G Infrastructure. To reduce the time to market, car-
+riers may couple their 5G core network equipment with
+existing 4G LTE infrastructures in what is known as a Non-
+Standalone Deployment (NSA). NSA utilizes 5G-NR for data
+plane operations while retaining the 4G infrastructure for
+control plane operations [14]. NSA is contrasted with a Stan-
+dalone deployment (SA), which is fully independent of legacy
+cellular infrastructures. Verizon ’s 5G uses the NSA model.
+Measurements of Cellular Networks. There exist a
+plethora of work on cellular network measurement, such
+25G
+4G
+1 2 4 8 16
+# of Parallel TCP Connections
+2500
+2000
+1500
+1000
+500
+0
+600
+450
+300
+150
+0
+(3) the UE is connected to 5G. This information is used for
+the handoff analysis in §4.3.
+5G
+4G
+4
+MEASUREMENT RESULTS
+We now describe our measurement results to highlight TCP
+performance using 5G, the impact of the environment such
+as obstruction on 5G, explain 5G handoffs, and finally show
+the impact of using 5G on application performance.
+Base 1 2 4 8 16
+# of Parallel TCP Conn.
+Figure 1: TCP perf. under LoS. (a) throughput, (b) RTT.
+4.1
+TCP Performance Under LoS
+We begin with understanding 5G performance when clear
+LoS is present. Specifically, we conduct experiments at Lo-
+cations A, B, and C (§3). At all locations, we ensure that
+we can visually see the 5G panel and there is LoS between
+the phone and the panel. At A and B, we select 5 UE-panel
+distances from 13m to 75m (we use a laser distance meter [7]
+to accurately measure the distance). For each distance, we
+experiment with 3 orientations: 0°, 45°, and 90° (see Figure 2).
+For C, the distance (62m) and orientation (0°) are fixed.
+In each test, we perform TCP bulk download for 60 seconds
+using {1, 2, 4, 8, 16} parallel TCP connections, and measure
+the throughput and RTT every second (reported by iPerf ).
+For all bulk download tests, unless otherwise mentioned, we
+start collecting data 20 seconds after the TCP flow(s) start in
+order to mitigate the impact of TCP slow start. We repeat
+the entire process 3 times. All experiments were conducted
+in clear weather with the phone being held in hand. We
+believe that the above combinations provide realistic and
+diverse environmental configurations of urban 5G access
+from smartphones. In addition, during all experiments, we
+place next to the SGS10 an SGS9 phone to conduct the same
+tests over 4G. We confirm that between the two phones,
+there is no interference that may degrade the performance.
+The two plots in Figure 1 show the measurement results
+of throughput and RTT, respectively, for different numbers
+of concurrent TCP connections. Each boxplot is across all
+1-second measurement samples for a specific setup. We
+make several observations. First, 5G offers much higher
+throughput than 4G. With 8 parallel TCP connections, the
+median 5G and 4G throughputs are 1520 and 147 Mbps, re-
+spectively. However, 5G throughput exhibits much higher
+variations than 4G despite the presence of LoS. This is due
+to the PHY-layer nature of 5G signals as well as potential
+inefficiencies at various layers. For example, at PHY/MAC
+layers, smartphones’ small form factor makes engineering
+5G modem challenging [30]. At the transport layer, an exces-
+sive number of TCP connections may incur cross-connection
+contentions.
+Second, 5G throughput improves as the TCP concurrency
+level increases. Through controlled experiments over wired
+networks and WiFi, we confirm that this is not caused by TCP
+Server Selection. Due to the ultra-high bandwidth of 5G,
+the bottleneck of an end-to-end path may easily shift from
+the wireless hop to the Internet – a situation that seldom
+appears in 3G/4G. Since the focus of our study is 5G, in most
+experiments we do not want such a shift to occur. To ensure
+this, we carefully select a Microsoft Azure server located
+in the U.S. east coast. We justify our selection as follows.
+First, when downloading data from this server, we get the
+highest 5G throughput (statistically) compared to servers in
+other locations or of other cloud providers. Second, when we
+conduct download test from this server to other hosts (e.g.,
+an Amazon cloud instance) over the Internet, we get ∼3 Gbps
+throughput, which is much higher than the highest 5G speed
+we can obtain, during different times of a day. Based on the
+above observations, we have high confidence that for an end-
+to-end path from a UE to our selected server, the Internet
+is unlikely to become the bottleneck. We also measure how
+end-to-end performance (latency and HTTP download time)
+is affected by server selection in §4.1 and §4.4.
+Test Workload. For most of our experiments, we perform
+large bulk data transfers for bandwidth probing. Specifically,
+our UE issues one or more TCP connections or a UDP session
+to download data from an Internet server. Since it is difficult
+to root our UEs, we run the cross-compiled version of iPerf
+3.6 [19] to measure key metrics including throughput, RTT,
+and packet loss rate. We also experiment with two important
+applications: web browsing and HTTP(S) file download over
+5G, with details to be described in §4.4.
+UE-side 5G Monitoring Tool. Due to 5G’s very recent
+debut, we are not aware of any dedicated UE-side monitoring
+tool for it. We therefore develop one that collects the follow-
+ing information to support our measurements: (1) the UE’s
+fine-grained location, (2) all available network interfaces,
+(3) the actively used network interface and its IP address,
+(4) the cell ID (mCID) that the device is connected to, (5) the
+cellular signal strength, and (6) the 5G service status. The
+above information is obtained from Android APIs. Regarding
+the last item (the 5G service status), we find that when the
+UE is connected to 5G, it will be in one of three states: (1) the
+UE is not in 5G coverage area, (2) the UE is in 5G area but is
+connected to 4G due to, for example, poor 5G signals, and
+3First Hop
+East US
+West US
+Panel 1
+RTT (ms) Total RTT Total RTT
+90°
+5G
+27±6.4
+54±4.5
+81±5.5
+Panel 2
+4G
+29±4.8
+58±4.3
+88±5.5
+45° 0°
+Table 1: 1st Hop RTT and impact of server’s
+network location on total (end-to-end) PING
+RTT on 4G/5G. The reported numbers are av- Figure 2:
+Orientation.
+eraged across all runs.
+(a)
+itself. We instead believe that Verizon is imposing per-TCP-
+connection rate limiting over 5G, whose bandwidth appears
+to be fully utilized when there are more than 8 concurrent
+connections. This practice may hurt the performance of
+single-connection protocols such as HTTP/2 [3].
+Third, regarding the latency, 5G and 4G exhibit similar
+base RTT (i.e., end-to-end PING) at around 56 ms. To un-
+derstand how much 5G contributes to this RTT, we perform
+traceroute on the UE to measure the hop-by-hop RTT. As
+shown in Table 1, we find that the first hop RTT, which pre-
+sumably covers the RAN (Radio Access Network), is around
+28 ms for both 4G and 5G, accounting for around 50% of
+the end-to-end RTT. Changing the server location to west
+U.S. reduces this fraction to around 33%. Overall, likely due
+to its NSA model that shares much 4G infrastructure with
+5G, Verizon ’s 5G network provides little improvement of the
+base RTT over 4G. We expect this to be addressed by the SA
+model that may achieve the goal of sub-millisecond RTT.
+We then consider the RTT during a bulk transfer. As
+shown in Figure 1(b), 4G RTT inflates drastically because
+of its deep in-network buffers [15, 17]. Bufferbloat in 5G is
+much less severe, likely due to the fast 5G speed that drains
+the buffer much faster than 4G. Also, 5G exhibits low packet
+loss rates (50%, 75%, 99% percentiles: 0.01%, 0.1%, 1.2%).
+We also study UDP over 5G. Since UDP does not provide
+congestion control, we manually increase the sending rate
+exponentially from 512 Kbps to 2 Gbps. we find that for
+sending rates up to 1 Gbps, the receiver-side loss rate is
+close to 0. This indicates 5G’s compatibility with UDP-based
+protocols such as QUIC [9] and HTTP/3 [4] at these low to
+medium data rates. However, at our test locations, Verizon ’s
+5G is not able to reliably sustain 2 Gbps or a higher sending
+rate over UDP, as we observe a packet loss rate of up to 17%
+at 2 Gbps.
+4.2
+750
+500
+250
+0
+human
+20
+human
+2000
+1000
+(b)
+0
+Handoffs
+4G 5G
+5G 4G
+5G
+4G
+0
+hand
+40
+60
+Timeline (seconds)
+80
+hand
+5G
+4G
+0
+20
+40
+60
+Timeline (seconds)
+80
+Figure 3: Obstruction tests. (a) Location C with ineffective
+multipath, (b) Location A with effective multipath.
+5G-NR panel (62m). We launch a bulk transfer over 5G with
+8 parallel TCP connections. During the data transfer, we
+block the LoS path by a human body and then a hand. We
+repeat the experiments for 10 times and observe qualitatively
+similar results, with one representative run illustrated in
+Figure 3(a). As shown, both obstructions trigger 5G-to-4G
+handoffs and lead to significant performance degradation.
+In contrast, when experimenting with 4G, neither blockage
+incurs noticeable throughput drop (figure not shown), due
+to the low-frequency bands used by 4G signals.
+The above results show that it is difficult for 5G signals
+to penetrate a hand or human body, causing NLoS between
+the transmitter and receiver. We then study other types of
+obstructions using similar methods. We find that when the
+UE is inside a backpack, a cardboard box, or a clear glass, 5G
+signals can penetrate these containers (experimented with
+<100 meters distance to the 5G panel with LoS). However,
+5G signals can hardly penetrate human body, trains, pillar
+structures, and tinted glass. We find that 5G works in vehicles
+since the front windshield is typically clear glass. However,
+when the vehicle is moving, mobility-incurred handoffs may
+considerably degrade 5G performance (§4.3).
+We next repeat the same experiment in Location A, also
+using a human body and a hand as obstructions. As shown in
+Figure 3(b), the impact of the obstructions becomes smaller:
+the 5G connectivity persists despite a fair amount of per-
+formance degradation. Figures 3(a) and (b) indicate that
+the environment can affect the impact of obstructions. At
+Location A, despite the NLoS created by the obstructions,
+the nearby buildings can reflect signals and create multiple
+paths, and the reflected signal can still reach the UE. At Lo-
+cation C, the room has UV-protective windows that are very
+common in today’s buildings. Since the windows attenuate
+reflected 5G signals [43], multipath becomes ineffective. In
+other words, the only effective signal propagation path is
+through the open window. Blocking it inevitably degrades
+the performance.
+Impact of the Environment
+Obstruction and NLoS Performance. The experiments
+in §4.1 assume a clear LoS path without any obstruction. We
+now place different types of objects along the LoS path to
+test whether 5G signals can penetrate/bypass them. We first
+exemplify two most common obstructions: human body and
+hand. We stay at Location C (the Chicago hotel room) with
+an open window through which the phone has LoS to the
+40° 45° 90°
+Orientation Angle (°)
+Figure 4: Impact of UE-
+panel orientation.
+w/ SS
+w/o SS
+2500
+2000
+1500
+1000
+500
+0
+Figure 5 plots the throughput distributions of different
+distances, where each box is across all 1-second samples
+measured at Locations B and D. As shown, the throughput
+only slightly reduces as the distance increases. For 8 paral-
+lel TCP connections, the median throughput decreases by
+only 17% (20%) at 100m (160m) compared to that at 25m. We
+attribute this to the clear LoS and sufficiently high transmis-
+sion power of 5G antennas. For a single TCP connection,
+no noticeable throughput drop is observed because of the
+bandwidth under-utilization.
+Overall, among all factors (obstruction, orientation, and
+distance), obstruction typically incurs the highest impact
+on 5G performance. Fortunately, in urban environments,
+surrounding signal reflections can oftentimes mitigate the
+performance degradation, allowing 5G to function under
+NLoS.
+1 conn.
+8 conn.
+25 50 75 100 160
+Dist. b/ UE & 5G-panel (meters)
+Figure 5: Impact of
+UE-panel distance on
+throughput.
+Impact of UE-panel Orientation. We also investigate
+how the UE’s orientation to the panel affects network per-
+formance. We define the orientation as the minimum angle
+between the LoS and all normal vectors of the base station’s
+panels. As illustrated in Figure 2, an orientation of 0° is pre-
+ferred because the panel is directly facing the UE, while an
+orientation of 90° is the least ideal case. Our orientation test
+is performed at Location D where we can find a large LoS
+area centered by a 5G tower. We pick three spots whose ori-
+entations are 0°, 45°, and 90°. All spots have a 25m distance
+to the tower. At each spot, we perform three 60-second bulk
+download tests using 8 parallel connections. As shown in the
+“w/o SS” boxes in Figure 4 (the default setting of performing
+60-second transfers excluding the slow start), we observe
+very small performance difference between 0° and 45° orien-
+tation, likely attributed to the environmental reflection and
+beamforming. However, in the extreme case where the orien-
+tation becomes 90°, we do observe a median throughput drop
+of 40%. The “w/ SS” boxes correspond to short (25-second)
+measurements from the very beginning of TCP connection
+establishment. They follow a similar trend except that when
+TCP slow start is considered, the throughput becomes lower.
+Impact of UE-Panel Distance. We study how the dis-
+tance between a UE and the panel affects network perfor-
+mance. We conduct the experiment at Location B, where we
+select five spots with their distances to the panel being 25m,
+50m, 75m, 100m, and 160m, respectively. The panel and the
+five spots are on the same line. At each spot, we conduct
+three 60-second bulk download tests using 1 and 8 parallel
+TCP connection(s). During all tests, we ensure that the UE
+is always associated with the same panel, i.e., there is no
+5G-4G or 5G-5G handoff (§4.3). Our test location (B) makes
+this easy: recall that B is at the boundary of Minneapolis’
+5G coverage area; we can therefore increase the UE-panel
+distance by moving the UE away from the coverage area
+without worrying the UE connecting to a different panel.
+Achieving this inside the 5G coverage area is more difficult
+due to the dense deployment of 5G base stations. We find
+that at Location D (near the stadium), the phone can also
+reliably connect to the same panel at a long distance. So we
+conduct our test there as well.
+4.3
+Handoffs in 5G
+Handoffs in 5G differ from those in 4G/3G in both the hori-
+zontal and vertical dimensions. A Horizontal Handoff (HH)
+occurs when a UE’s association switches from one panel (in
+5G’s term) to another. In 5G, HHs may frequently occur due
+to the smaller coverage of 5G panels compared to 4G tow-
+ers. A Vertical Handoff (VH) is triggered when the wireless
+technology changes (e.g., 5G to 4G). VHs are also prevalent
+in 5G whose signals are more unstable than 4G. Handoffs in
+5G are more frequent than 4G due to small coverage of 5G
+base stations and the instability of 5G signals. 5G handoffs
+are also more complex as they involve switching between
+4G and 5G subsystems.
+We closely examine Verizon ’s handoff mechanisms. In 5G
+NSA, a UE may be in one of the three states: (1) the UE is
+connected to 5G, (2) the UE is in 5G coverage area but is
+connected to 4G due to, for example, poor 5G signals, and
+(3) the UE is not in 5G area. We refer to these states as C
+(Connected to 5G), R (Ready for 5G but not yet connected),
+and O (outside 5G coverage), respectively, and we identify
+them by our monitoring tool. We use this state and the cell
+ID field (also collected by our tool) to track both HH and VH.
+Note that in 5G, cell IDs identify 5G-NR panels.
+We then conduct experiments in both cities under various
+mobility levels (stationary, rotating, walking, and driving)
+to capture the above data related to handoffs. We identify 4
+types of primitive handoffs (P1 to P4) as listed in the upper
+part of Table 2. P1 and P2 are VHs because there are handoffs
+between 4G and 5G. When a UE’s 5G signal strength drops
+(e.g., due to an NLoS obstruction), P1 is triggered to down-
+grade the connectivity from 5G to 4G; when the network
+condition improves, the connectivity will be restored back to
+5G (P2). Note that in the 5G-ready (R) mode, the UE actually
+connects to a 4G radio that is on the same tower (where the
+5G-NR panel resides) or a nearby tower, but the cell ID does
+5Description
+VH, 5G→4G, same cellID
+VH, 4G→5G, same cellID
+VH+HH, 5G→4G, diff cellID
+HH, 4G→4G, diff cellID
+Sequence
+C1→R1
+R1→C1
+C1→R2
+R1→R2
+Type
+P1
+P2
+P3
+P4
+10
+7
+4
+1
+Description
+Sequence
+5G temporarily disrupted, same panel
+P1, P2
+5G to 5G between two panels
+P3, P2
+5G to 5G between two panels
+P1, P4, P2
+5G to 4G between two panels
+P1, P4
+4G to 5G between two panels
+P4, P2
+Table 2: Primitive (top) & combinational (bottom) handoffs.
+Type
+O1
+O2
+O3
+O4
+O5
+1000
+Handoff Type:
+P2
+P4
+O1
+Wiki
+588KB
+BingH
+553KB
+GG-I
+2MB
+GG-H
+838KB
+BingI
+741KB
+YT
+2MB
+FoxN CNN
+9MB 15MB
+ebay
+3MB
+Figure 7: 4G/5G PLT over 9 pages: Bing, Wikipedia, Bing
+Search, Google, YouTube, Google Search, eBay, FoxNews,
+CNN.
+O5
+5G
+4G
+500
+0
+P1
+5G
+4G
+0
+50 100 150 200 250 300 350 400 450
+Timeline (in seconds) (Walking a 700m loop in downtown region)
+Figure 6: 5G throughput and handoffs under low mobility.
+not change. This is likely because of NSA where 4G and 5G
+are deeply coupled. At the R state, the UE is still closely mon-
+itoring the original 5G panel for a possible 4G to 5G upgrade.
+P3 is similar to P1 except that the 5G to 4G downgrade ends
+at a different cell ID (panel). P4 is a 4G to 4G HH from one
+cell ID to another. We do not observe a C1→C2 or R1→C2
+sequence in our data. This is likely because NSA uses 4G for
+control-plane signaling – the UE will always first associate
+with the new cell’s 4G radio for control message exchanges
+before establishing the 5G data channel.
+Interestingly, we also find that the (in)activity of user
+traffic can trigger 4G-5G handoffs. A P1 handoff will occur
+when there is an inactivity of user traffic for ∼10 seconds; at
+the R state, any user traffic will restore the 5G connectivity
+through a P2 handoff, if the 5G signal is good. The rationale
+of such traffic-guided handoffs is possibly to reduce the 5G
+standby time that may consume additional energy.
+From our data, we observe that oftentimes the primitive
+handoffs form complex sequences that we call combinational
+handoff sequences. We identify them by clustering primi-
+tive handoffs using an interval threshold (set to 10 seconds).
+They are exemplified at the bottom part of Table 2 as O1 to
+O5. These combinational sequences correspond to high-level
+events that can not be realized by a single primitive handoff.
+For example, O3 represents a 5G-to-5G handoff that consists
+of three primitive handoffs: a 5G to 4G VH on the old panel,
+a 4G to 4G HH from the old to new panel, and a 4G to 5G
+VH on the new panel. The whole procedure takes several
+seconds to finish.
+We next show a case study to demonstrate the impact
+of handoffs. In this experiment, one of the authors holds a
+phone while walking at a normal speed (∼5 km/h) at Loca-
+tion A for about 8 minutes. The phone keeps downloading
+data from a server over 8 parallel connections. Figure 6 plots
+the throughput, cellular connectivity (4G/5G), and hand-
+offs. During this 8-minute walk, the phone experiences 31
+primitive handoffs and bounces between 4G and 5G for 13
+times. Such frequent switches make the throughput highly
+fluctuating, ranging from 0 to 954 Mbps. This may confuse
+applications (e.g., video rate adaptation logic [18, 22, 42]) and
+bring highly inconsistent user experiences. The above results
+highlight the need for cross-layer efforts that improve 5G
+performance under (even low) mobility. Some directions for
+example include PHY/MAC enhancements for reducing the
+handoff frequency, and robust upper-layer solutions that can
+adapt to frequent 4G/5G handoffs, such as MPTCP [24] and
+prefetching [13].
+4.4
+Application Performance
+Web Browsing. We develop a WebView-based browser and
+use it to programmatically load the landing pages of 9 pop-
+ular websites listed in Figure 7 over 5G and 4G. We then
+compare their page loading time (PLT). We conduct the ex-
+periments at Locations A and C with SGS10 (5G) and SGS9
+(4G). In order to make a fair comparison, we confirm that
+both devices yield statistically similar PLT when loading
+diverse web pages locally. In Location A (C), the UE-panel
+distance is 50m (62m) with LoS. For each site, We use an
+automated script to perform cold-cache loading (i.e., with
+an empty web cache) over 5G and 4G back-to-back, and re-
+peat this for 30 times. As shown in Figure 7, for most sites
+with small page sizes (≤ 3 MB), 4G and 5G achieve similar
+PLT. This is attributed to two reasons. First, web brows-
+ing requires a synergy between network transfer and local
+processing, with the latter oftentimes being the bottleneck
+in particular for small web pages [40]. Second, as we load
+the pages from the original content providers, the bottle-
+neck may shift from the wireless hop to the Internet. For
+large pages (FoxNews and CNN), loading them over 5G does
+shorten the median PLT by 17.5% and 23.6%, respectively,
+because of the reduction of the content fetch time.
+6GoogleCDN
+VDMSCDN
+CloudfrontCDN
+AkamaiCDN
+AzureCDN
+AWS-West
+Azure-East
+AWS-East
+Azure-West
+plan to explore them in our future work. Finally, we did not
+address 5G upload performance because Verizon ’s mmWave
+deployment did not support high upload speeds, the highest
+we achieved was 60Mbps.
+Acknowledgement. This research was supported in part
+by NSF under Grants CNS-1618339, CNS-1617729, CNS-1814322,
+CNS-1831140, CNS-1836772, and CNS-1901103.
+Server
+CDN
+0 250 500 750 1000
+Throughput (Mbps)
+REFERENCES
+Figure 8: HTTP(S) download throughput for 9 CDN/cloud
+[1] Omid Abari, Dinesh Bharadia, Austin Duffield, and Dina Katabi. 2017.
+Enabling high-quality untethered virtual reality. In Proceedings of the
+14th USENIX Symposium on Networked Systems Design and Implemen-
+tation. 531–544.
+[2] Christopher R Anderson and Theodore S Rappaport. 2004. In-building
+wideband partition loss measurements at 2.5 and 60 GHz. IEEE trans-
+actions on wireless communications 3, 3 (2004), 922–928.
+[3] M. Belshe, R. Peon, and Ed. M. Thomson. 2015. Hypertext Transfer
+Protocol Version 2 (HTTP/2). RFC 7540. Internet Engineering Task
+Force. https://tools.ietf.org/html/rfc7540
+[4] Mike Bishop. 2019. Hypertext Transfer Protocol Version 3 (HTTP/3)
+(IETF Draft). (2019). Retrieved June 2019 from https://quicwg.org/
+base-drafts/draft-ietf-quic-http.html
+[5] Sylvain Collonge, Gheorghe Zaharia, and G EL Zein. 2004. Influence
+of the human activity on wide-band characteristics of the 60 GHz
+indoor radio channel. IEEE Transactions on Wireless Communications
+3, 6 (2004), 2396–2406.
+[6] Haotian Deng, Chunyi Peng, Ans Fida, Jiayi Meng, and Y Charlie Hu.
+2018. Mobility Support in Cellular Networks: A Measurement Study
+on Its Configurations and Implications. In Proceedings of the Internet
+Measurement Conference 2018. ACM, 147–160.
+[7] Leica Geosystems. 2019. Leica DISTO E7500i LDM. (June 2019).
+Retrieved June 2019 from https://lasers.leica-geosystems.com/disto/
+e7500i
+[8] Marco Giordani, Marco Mezzavilla, and Michele Zorzi. 2016. Initial
+Access in 5G mmWave Cellular Networks. IEEE Communications
+Magazine 54, 11 (2016), 40–47.
+[9] Google. 2019. QUIC, a multiplexed stream transport over UDP. (2019).
+Retrieved June 2019 from https://www.chromium.org/quic
+[10] Yihua Ethan Guo, Ashkan Nikravesh, Z Morley Mao, Feng Qian, and
+Subhabrata Sen. 2017. Accelerating multipath transport through bal-
+anced subflow completion. In Proceedings of the 23rd Annual Interna-
+tional Conference on Mobile Computing and Networking. ACM, 141–
+153.
+[11] Muhammad Kumail Haider, Yasaman Ghasempour, Dimitrios Kout-
+sonikolas, and Edward W Knightly. 2018. Listeer: mmwave beam
+acquisition and steering by tracking indicator leds on wireless aps.
+In Proceedings of the 24th Annual International Conference on Mobile
+Computing and Networking. ACM, 273–288.
+[12] Daniel Halperin, Srikanth Kandula, Jitendra Padhye, Paramvir Bahl,
+and David Wetherall. 2011. Augmenting data center networks with
+multi-gigabit wireless links. In ACM SIGCOMM Computer Communi-
+cation Review, Vol. 41. ACM, 38–49.
+[13] Brett D Higgins, Jason Flinn, Thomas J Giuli, Brian Noble, Christopher
+Peplin, and David Watson. 2012. Informed mobile prefetching. In
+Proceedings of the 10th international conference on Mobile systems,
+applications, and services. ACM, 155–168.
+[14] Anders Hillbur. 2018. 5G deployment options to reduce the complexity.
+(November 2018). Retrieved June 2019 from https://www.ericsson.com/
+en/blog/2018/11/5g-deployment-options-to-reduce-the-complexity
+[15] Junxian Huang, Feng Qian, Yihua Guo, Yuanyuan Zhou, Qiang Xu,
+Z Morley Mao, Subhabrata Sen, and Oliver Spatscheck. 2013. An
+in-depth study of LTE: effect of network protocol and application
+servers over 5G.
+HTTP(S) Download. We investigate the HTTP(S) down-
+load performance. We upload a 1GB file to geographically
+distributed public cloud instances and CDN servers 2 . We
+then develop a custom HTTP(S) client that issues 8 parallel
+byte-range requests each fetching 1/8 of the file over 5G. The
+experiments are conducted at Locations A and C (clear LoS
+with a UE-panel distance of 30m for A and 62m for C, 0° ori-
+entation). For each server, we repeat the file download for 3
+times at both locations, and measure the average throughput.
+The results are shown in Figure 8. We find that all cloud/CDN
+servers exhibit low throughput compared to the iPerf through-
+put shown in Figure 1(a): the average throughput ranges
+from 119 to 730 Mbps with a median of 222 Mbps across all
+servers. The somewhat surprising results make us realize that
+HTTP(S) download is very different from iPerf bandwidth
+probing. Multiple factors may slow down HTTP(S) down-
+load, such as the HTTP request latency, TCP slow start, DNS
+time, Internet-side bottleneck link, server-side data process-
+ing (e.g., HTTP chunked mode and HTTP/2 multiplexing),
+HTTPS encryption/decryption, unbalanced byte-range ses-
+sions (some sessions may finish earlier than others [10]), to
+name a few. Although these factors already exist in 3G/4G
+eras, they are amplified in 5G due to its high speed. The above
+results indicate that 5G’s high throughput does not always
+translate to better app QoE, whose improvement requires
+joint, cross-layer optimizations from multiple sources.
+5
+CONCLUDING REMARKS
+Our study on the world’s first commercial mmWave 5G net-
+work quantitatively reveal 5G performance on COTS smart-
+phones to the community. Our study identifies key research
+directions on improving 5G users’ experience in a cross-layer
+manner. For example, how to design 5G-friendly transport
+protocols? How to strategically select interface(s) among
+5G, 4G, and WiFi? What type of support should a mobile OS
+provide for enhancing QoE over 5G? Meanwhile, we admit
+that this short paper leaves many interesting measurement
+questions unanswered, such as 5G video streaming perfor-
+mance, interaction between 5G and various TCP congestion
+control schemes, and detailed 5G radio energy models. We
+2
+We do not use the CDN servers to perform most measurements in early
+sections because we could not run iPerf on these servers.
+7behavior on performance. In ACM SIGCOMM.
+[16] Junxian Huang, Qiang Xu, Birjodh Tiwana, Z Morley Mao, Ming
+[32]
+Zhang, and Paramvir Bahl. 2010. Anatomizing application perfor-
+mance differences on smartphones. In Proceedings of the 8th interna-
+tional conference on Mobile systems, applications, and services. ACM,
+165–178.
+[17] Haiqing Jiang, Yaogong Wang, Kyunghan Lee, and Injong Rhee. 2012.
+Tackling bufferbloat in 3G/4G networks. In Proceedings of the 2012
+[33]
+Internet Measurement Conference. ACM, 329–342.
+[18] Junchen Jiang, Vyas Sekar, and Hui Zhang. 2012. Improving Fairness,
+Efficiency, and Stability in HTTP-Based Adaptive Video Streaming
+With Festive. In Proceedings of CoNEXT 2012. ACM, 97–108.
+[34]
+[19] ESnet/Lawrence Berkeley National Laboratory. 2019. iperf3: A TCP,
+UDP, and SCTP network bandwidth measurement tool. (June 2019).
+Retrieved June 2019 from https://github.com/esnet/iperf/releases/tag/
+3.6
+[20] Li Li, Ke Xu, Tong Li, Kai Zheng, Chunyi Peng, Dan Wang, Xiangxiang
+[35]
+Wang, Meng Shen, and Rashid Mijumbi. 2018. A measurement study
+on multi-path TCP with multiple cellular carriers on high speed rails.
+In Proceedings of the 2018 Conference of the ACM Special Interest Group
+[36]
+on Data Communication. ACM, 161–175.
+[21] Yuanjie Li, Chunyi Peng, Zengwen Yuan, Jiayao Li, Haotian Deng, and
+Tao Wang. 2016. Mobileinsight: Extracting and analyzing cellular net-
+[37]
+work information on smartphones. In Proceedings of the 22nd Annual
+International Conference on Mobile Computing and Networking. ACM.
+[22] Hongzi Mao, Ravi Netravali, and Mohammad Alizadeh. 2017. Neural
+adaptive video streaming with pensieve. In Proceedings of the Confer-
+[38]
+ence of the ACM Special Interest Group on Data Communication. ACM,
+197–210.
+[23] Motorola. 2019. 5G Moto Mod. (2019). Retrieved June 2019 from
+https://www.motorola.com/us/products/moto-mods/moto-5g
+[39]
+[24] Ashkan Nikravesh, Yihua Guo, Feng Qian, Z Morley Mao, and Sub-
+habrata Sen. 2016. An in-depth understanding of multipath TCP on
+mobile devices: measurement and system design. In Proceedings of
+[40]
+the 22nd Annual International Conference on Mobile Computing and
+Networking. ACM, 189–201.
+[25] Thomas Nitsche, Guillermo Bielsa, Irene Tejado, Adrian Loch, and
+Joerg Widmer. 2015. Boon and bane of 60 GHz networks: practical
+[41]
+insights into beamforming, interference, and frame level operation.
+In Proceedings of the 11th ACM Conference on Emerging Networking
+Experiments and Technologies. ACM, 17.
+[42]
+[26] Thomas Nitsche, Adriana B Flores, Edward W Knightly, and Joerg Wid-
+mer. 2015. Steering with eyes closed: mm-wave beam steering without
+in-band measurement. In Computer Communications (INFOCOM), 2015
+IEEE Conference on. IEEE, 2416–2424.
+[43]
+[27] Joan Palacios, Danilo De Donno, and Joerg Widmer. 2017. Tracking
+mm-Wave channel dynamics: Fast beam training strategies under
+mobility. In Proceedings of the IEEE Conference on Computer Commu-
+nications.
+[28] Hang Qiu, Fawad Ahmad, Fan Bai, Marco Gruteser, and Ramesh Govin-
+[44]
+dan. 2018. AVR: Augmented Vehicular Reality. In Proceedings of the
+16th Annual International Conference on Mobile Systems, Applications,
+and Services. ACM, 81–95.
+[29] Qualcomm. 2019. Everything You Need to Know About 5G. (2019).
+[45]
+Retrieved June 2019 from https://www.qualcomm.com/invention/5g/
+what-is-5g
+[30] Qualcomm. 2019.
+Mobilizing mmWave for smart-
+phones.
+(2019).
+Retrieved June 2019 from
+[46]
+https://www.qualcomm.com/news/onq/2019/02/13/
+track-solve-another-impossible-challenge-mobilizing-mmwave-smartphones
+[31] Theodore S Rappaport, Eshar Ben-Dor, James N Murdock, and Yijun
+Qiao. 2012. 38 GHz and 60 GHz angle-dependent propagation for
+8
+cellular & peer-to-peer wireless communications. In Communications
+(ICC), 2012 IEEE International Conference on. IEEE, 4568–4573.
+Theodore S Rappaport, Felix Gutierrez, Eshar Ben-Dor, James N Mur-
+dock, Yijun Qiao, and Jonathan I Tamir. 2013. Broadband millimeter-
+wave propagation measurements and models using adaptive-beam
+antennas for outdoor urban cellular communications. IEEE transac-
+tions on antennas and propagation 61, 4 (2013), 1850–1859.
+Theodore S Rappaport, Shu Sun, Rimma Mayzus, Hang Zhao, Yaniv
+Azar, Kevin Wang, George N Wong, Jocelyn K Schulz, Mathew Samimi,
+and Felix Gutierrez. 2013. Millimeter wave mobile communications
+for 5G cellular: It will work! IEEE access 1 (2013), 335–349.
+Wonil Roh, Ji-Yun Seol, Jeongho Park, Byunghwan Lee, Jaekon Lee,
+Yungsoo Kim, Jaeweon Cho, Kyungwhoon Cheun, and Farshid Aryan-
+far. 2014. Millimeter-wave beamforming as an enabling technology
+for 5G cellular communications: theoretical feasibility and prototype
+results. IEEE Communications Magazine 52, 2 (2014), 106–113.
+Clayton Shepard, Ahmad Rahmati, Chad Tossell, Lin Zhong, and
+Phillip Kortum. 2011. LiveLab: measuring wireless networks and
+smartphone users in the field. ACM SIGMETRICS Performance Evalua-
+tion Review 38, 3 (2011), 15–20.
+Sanjib Sur, Ioannis Pefkianakis, Xinyu Zhang, and Kyu-Han Kim. 2017.
+WiFi-Assisted 60 GHz Wireless Networks. In MobiCom.
+Sanjib Sur, Vignesh Venkateswaran, Xinyu Zhang, and Parmesh Ra-
+manathan. 2015. 60 ghz indoor networking through flexible beams:
+A link-level profiling. In ACM SIGMETRICS Performance Evaluation
+Review, Vol. 43. ACM, 71–84.
+Zhaowei Tan, Yuanjie Li, Qianru Li, Zhehui Zhang, Zhehan Li, and
+Songwu Lu. 2018. Supporting mobile VR in LTE networks: How close
+are we? Proceedings of the ACM on Measurement and Analysis of
+Computing Systems 2, 1 (2018), 8.
+Xiaozheng Tie, Kishore Ramachandran, and Rajesh Mahindra. 2012.
+On 60 ghz wireless link performance in indoor environments. In Pas-
+sive and Active Measurement. Springer, 147–157.
+Xiao Sophia Wang, Aruna Balasubramanian, Arvind Krishnamurthy,
+and David Wetherall. 2013. Demystifying page load performance
+with WProf. In Presented as part of the 10th {USENIX} Symposium on
+Networked Systems Design and Implementation ({NSDI} 13). 473–485.
+Hao Xu, Vikas Kukshya, and Theodore S Rappaport. 2002. Spatial and
+temporal characteristics of 60-GHz indoor channels. IEEE Journal on
+selected areas in communications 20, 3 (2002), 620–630.
+Xiaoqi Yin, Abhishek Jindal, Vyas Sekar, and Bruno Sinopoli. 2015. A
+control-theoretic approach for dynamic adaptive video streaming over
+HTTP. In ACM SIGCOMM Computer Communication Review, Vol. 45.
+ACM, 325–338.
+Hang Zhao, Rimma Mayzus, Shu Sun, Mathew Samimi, Jocelyn K
+Schulz, Yaniv Azar, Kevin Wang, George N Wong, Felix Gutierrez Jr,
+and Theodore S Rappaport. 2013. 28 GHz millimeter wave cellular
+communication measurements for reflection and penetration loss in
+and around buildings in New York city.. In ICC. 5163–5167.
+Xia Zhou, Zengbin Zhang, Yibo Zhu, Yubo Li, Saipriya Kumar, Amin
+Vahdat, Ben Y Zhao, and Haitao Zheng. 2012. Mirror mirror on the
+ceiling: Flexible wireless links for data centers. ACM SIGCOMM
+Computer Communication Review 42, 4 (2012), 443–454.
+Yibo Zhu, Zengbin Zhang, Zhinus Marzi, Chris Nelson, Upamanyu
+Madhow, Ben Y Zhao, and Haitao Zheng. 2014. Demystifying 60GHz
+outdoor picocells. In Proceedings of the 20th annual international con-
+ference on Mobile computing and networking. ACM, 5–16.
+Yibo Zhu, Xia Zhou, Zengbin Zhang, Lin Zhou, Amin Vahdat, Ben Y
+Zhao, and Haitao Zheng. 2014. Cutting the cord: a robust wireless
+facilities network for data centers. In Proceedings of the 20th annual
+international conference on Mobile computing and networking. ACM,
+581–592
