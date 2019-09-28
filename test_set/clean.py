@@ -37,17 +37,15 @@ def clean(t):
     text = text.replace("- ",'')
     print(text)
     tokens = word_tokenize(text)
-    tokens = list(set(tokens))
     l = []
     for token in tokens:
         l.append(token.lower())
     for token in l:
         if token in stop_words:
             l.remove(token)
-    for token in l:
-        if token in string.punctuation:
-            l.remove(token)
-    return " ".join(l)
+    l = list(filter(lambda a: a not in string.punctuation, l))
+    k = " ".join(l)
+    return k
 
 for i in range(5):
     te = open("./abstarct" + str(i+1) + ".txt", "r+").read()
