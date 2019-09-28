@@ -1,0 +1,8 @@
+Mental well-being technologies possess many qualities that give them the potential to help people
+receive assessment and treatment who may otherwise not receive help due to fear of stigma or lack of
+resources. The combination of advances in sensors, microcontrollers and machine learning is leading
+to the emergence of dedicated tangible interfaces to monitor and promote positive mental well-being.
+However, there are key technical, ergonomic and aesthetic challenges to be overcome in order to
+make these interfaces effective and respond to users’ needs. In this paper, the barriers to develop
+mental well-being tangible interfaces are discussed by identifying and examining the recent
+technological challenges machine learning, sensors, microcontrollers and batteries create. 

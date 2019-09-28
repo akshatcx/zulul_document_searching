@@ -1,0 +1,17 @@
+Abstract—In this paper we address the problem of resource
+allocation for alarm traffic in industrial Internet of Things
+networks using massive MIMO. We formulate the general
+problem of how to allocate pilot signals to alarm traffic such
+that delivery is guaranteed, while also minimising the number of
+pilots reserved for alarms, thus maximising the channel resources
+available for other traffic, such as industrial control traffic. We
+present an algorithm that fulfils these requirements, and evaluate
+its performance both analytically and through a simulation
+study. For realistic alarm traffic characteristics, on average our
+algorithm can deliver alarms within two time slots (of duration
+equal to the 5G transmission time interval) using fewer than 1.5
+pilots per slot, and even in the worst case it uses around 3.5
+pilots in any given slot, with delivery guaranteed in an average
+of approximately four slots.
+Index Terms—Industrial IoT; massive MIMO, 5G; URLLC;
+pilot allocation; collision tree

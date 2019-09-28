@@ -1,0 +1,8 @@
+This study attempts to understand the use of Consumer Packaged Goods (CPG) in practice to obtain
+insights to develop design interventions that bring the CPGs into the Internet of Things. Our ultimate
+aim is to equip CPGs with a layer of smartness so that CPGs could collect information about their use
+and provide extra services and functionalities. With a practice perspective we developed an assemblage
+of methods to analyze and represent how people use CPGs. We chose cooking as our practice case
+and use an autoethnographic data sample to demonstrate the application of our methods. Despite
+the early stage of our study, our methods provide ways to get an understanding of how CPGs are
+used in practice and an opening to establish opportunities for design interventions
