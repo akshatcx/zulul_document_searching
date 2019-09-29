@@ -1,11 +1,7 @@
-arxiv==0.5.1
-certifi==2019.9.11
-chardet==3.0.4
-feedparser==5.2.1
-idna==2.8
 nltk==3.4.5
+numpy==1.17.2
+pandas==0.25.1
 pkg-resources==0.0.0
-pytest-runner==5.1
-requests==2.22.0
+python-dateutil==2.8.0
+pytz==2019.2
 six==1.12.0
-urllib3==1.25.6
