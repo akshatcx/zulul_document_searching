@@ -1,0 +1,3936 @@
+,paper_text
+0,"'2019 marks the year for 5G, which was eventually rolled
+out for commercial services to consumers. Compared to 4G
+LTE, 5G offers significantly higher bandwidth, lower latency,
+and better scalability (i.e., supporting more devices). The
+mainstream 5G deployment employs the millimeter wave
+(mmWave) technology that can provide, in theory, a through-
+put of up to 20 Gbps – a 100× improvement compared to
+today’s 4G, as well as <1ms latency [29]. Under the hood,
+this is achieved by a series of innovations including massive
+MIMO, advanced channel coding, and scalable modulation.
+5G is expected to fuel a wide range of applications that
+cannot be well supported by 4G, such as ultra-HD (UHD)
+video streaming, networked VR/AR, low-latency cloud gam-
+ing, IoT, and vehicle-to-everything (V2X) communication.
+Despite these potentials, commercial 5G services are at their
+infancy. In April 2019, Verizon launched 5G in Chicago and
+Minneapolis. It uses a 400 MHz channel at 28 GHz, making
+it the world’s first commercial mmWave 5G service for con-
+sumers. Most major carriers around the world are rolling out
+5G this year or in the process of expanding their footprint
+to more cities.
+In this paper, we conduct to our knowledge a first mea-
+surement study of commercial mmWave 5G networks on
+smartphones. We travel to Verizon ’s 5G coverage areas at the
+two cities and conduct detailed measurements of Verizon ’s
+mmWave 5G networks. We compare the performance of
+5G and 4G on key metrics such as throughput, latency, and
+packet loss rate. Since mmWave signals are vulnerable to ob-
+struction and attenuation, we conduct our experiments under
+diverse scenarios with different distances/orientations be-
+tween the smartphone and the 5G-NR (New Radio) panel, and
+obstruction levels. Furthermore, we study other important
+aspects such as 4G/5G handoffs, application performance,
+and many of whose characteristics are quite different from
+those of 4G. Our two-month experiments consume 10 TB 5G
+traffic and 1 TB 4G traffic 1 . We summarize our key findings
+as follows.
+• 5G offers much higher throughput than 4G (median through-
+put: 1520 vs. 147 Mbps). However, even under clear line-of-
+sight, 5G throughput exhibits much higher variation than
+4G, mainly due to the PHY-layer nature of 5G signals (§4.1).
+• Verizon very likely imposes a per-TCP-connection throt-
+tling on 5G traffic. This may hurt the performance of single-
+connection protocols such as HTTP/2. Due to its non-standalone
+deployment (§2), Verizon ’s 5G offers little improvement of
+the end-to-end PING RTT over 4G. However, the bufferbloat
+becomes less severe likely because of 5G’s high speed (§4.1).
+• 5G performance may be affected by obstruction, distance,
+and device-tower orientation. Among these factors, obstruc-
+tion typically incurs the highest impact. We find that 5G
+signals can be easily blocked by hands and human body. De-
+spite that, in urban environments, surrounding signal reflec-
+tions can oftentimes mitigate the performance degradation,
+allowing 5G to function under non-line-of-sight (§4.2).
+• 4G-5G handoffs can be triggered by either network con-
+dition change or user traffic. Even under low mobility (e.g.,
+walking), a smartphone may experience 31 4G/5G handoffs
+in less than 8 minutes. Due to the discrepancy between 4G
+and 5G, frequently switching between them may confuse ap-
+plications (e.g., video rate adaptation logic) and bring highly
+inconsistent user experiences (§4.3).
+• For web browsing, 5G brings little page load time reduction
+for most small web pages compared to 4G. For large HTTP(S)
+1 We
+purchased multiple unlimited 5G data plans from Verizon for this
+study. Our study conforms to Verizon’s wireless customer agreement.download, the goodput is significantly lower than the avail-
+able 5G bandwidth, because many cross-layer factors may
+potentially slow down the download (§4.4).
+At a high level, we find that despite its high throughput,
+today’s 5G has several limitations such as large performance
+variations, vulnerability to obstructions, and frequent hand-
+offs even during low mobility. We also experimentally show
+that 5G’s high throughput does not always translate to bet-
+ter app QoE, whose improvement requires joint, cross-layer
+optimizations from multiple players in the mobile ecosystem.
+We make the following contributions in this paper.
+• We develop practical and sound measurement methodolo-
+gies for mmWave 5G networks on COTS smartphones.
+• We present timely measurement findings of mmWave 5G
+performance on smartphones with key insights. As our ex-
+periments were conducted when commercial 5G had just
+made its debut, our results provide an important “baseline”
+for studying how 5G performance evolves.
+• We intend to release our measurement data to the research
+community to benefit work that needs real 5G data.
+2
+as crowd-sourced measurements of 3G [16, 35], LTE perfor-
+mance characterization using ISP data [15], studies of cellular
+network configurations [6], cellular performance under high
+mobility [20], using cellular to support emerging applica-
+tions such as VR [38], and measurement tools [21], to name
+just a few. None of the above work studies 5G networks that
+have been very recently commercialized.
+3
+MEASUREMENT METHODOLOGY
+5G Networks. All our experiments were conducted over
+Verizon ’s 5G network. As of June 2019, Verizon is the only
+cellular carrier in the U.S. that offers commercial mmWave-
+based 5G services to consumers at specific downtown areas
+in two cities: Minneapolis and Chicago. In both cities’ 5G
+coverage areas, dense 5G base stations are deployed. Due
+to Verizon ’s adoption of NSA (§2), 5G base stations are typi-
+cally co-located with or very close to those of 4G (based on
+our knowledge and visual inspection). A 5G base station is
+typically equipped with two panels that are the mmWave
+transceivers. We observe that the panels typically face popu-
+lated areas such as streets and pedestrian walkways.
+5G User Equipment (UE). We use two types of COTS
+5G-capable smartphones: Motorola Moto Z3 and Samsung
+Galaxy S10 5G (SM-G977U), henceforth referred to as MZ3
+and SGS10, respectively. They are the only two types of
+commercially available 5G smartphones from Verizon as of
+mid-June 2019. SGS10 has a built-in 5G radio, while MZ3 re-
+quires a separate accessory called 5G Mod [23] for accessing
+5G. Comparing their performance at same locations, we find
+that MZ3 significantly underperforms SGS10 in terms of 5G
+throughput, likely due to hardware issues of MZ3 or its 5G
+mod. To further ensure that our experiments are not affected
+by device artifacts, we purchase two SGS10 and confirm that
+they exhibit similar 5G performance. Our experience indi-
+cates the importance of selecting proper devices for studying
+emerging wireless technologies such as 5G. Thus, unless oth-
+erwise mentioned, all 5G results presented in the paper are
+from SGS10. We confirm that despite 5G’s high throughput,
+the device-side processing is not a bottleneck. In some ex-
+periments, we also employ a Samsung Galaxy S9 (SGS9) over
+4G for 4G-5G comparison. We use SGS9 because we are not
+able to manually switch between 5G and 4G on SGS10.
+Experiment Sites. We conduct experiments at 4 loca-
+tions (A, B, C, and D). A is a popular downtown area in
+Minneapolis with many buildings. B is at the boundary of
+the 5G coverage area in downtown Minneapolis. C is inside
+a hotel room in downtown Chicago where we stand near an
+open window. D is near the U.S. bank stadium in Minneapolis
+with large open space. We believe that these 4 locations are
+representative in terms of their environment (open/crowded
+space, low/high surrounding buildings, indoor/outdoor, etc.).
+BACKGROUND AND RELATED WORK
+mmWave is an innovative technology integrated into 5G.
+Unlike 3G/4G that works at ≤5 GHz, mmWave radios oper-
+ate at much higher frequencies of 30 to 300 GHz. Despite its
+high bandwidth, mmWave’s short wavelength makes its sig-
+nals vulnerable to attenuation. To overcome this, mmWave
+transceivers have to use phased-array antennas to form
+highly directional beams. Due to the pseudo-optical nature
+of a beam, the signals are sensitive to blockages such as a
+pedestrian or a moving vehicle. Switching from line-of-sight
+(LoS) to none-line-of-sight (NLoS) due to blockage may cause
+significant data rate drop or even complete blackout despite
+the beamforming algorithm that attempts to “recalibrate” the
+beams by seeking for a reflective NLoS path [26, 36].
+Researchers have demonstrated the feasibility of deploy-
+ing mmWave in data centers [12, 44, 46], indoor [1, 2, 5, 11,
+25, 37, 39, 41], and outdoor environments [28, 31–33, 43, 45],
+as well as have conducted many studies on beamforming and
+beam tracking [8, 27, 34]. But none of them studies mmWave
+in commercial 5G context on smartphones.
+5G Infrastructure. To reduce the time to market, car-
+riers may couple their 5G core network equipment with
+existing 4G LTE infrastructures in what is known as a Non-
+Standalone Deployment (NSA). NSA utilizes 5G-NR for data
+plane operations while retaining the 4G infrastructure for
+control plane operations [14]. NSA is contrasted with a Stan-
+dalone deployment (SA), which is fully independent of legacy
+cellular infrastructures. Verizon ’s 5G uses the NSA model.
+Measurements of Cellular Networks. There exist a
+plethora of work on cellular network measurement, such
+25G
+4G
+1 2 4 8 16
+# of Parallel TCP Connections
+2500
+2000
+1500
+1000
+500
+0
+600
+450
+300
+150
+0
+(3) the UE is connected to 5G. This information is used for
+the handoff analysis in §4.3.
+5G
+4G
+4
+MEASUREMENT RESULTS
+We now describe our measurement results to highlight TCP
+performance using 5G, the impact of the environment such
+as obstruction on 5G, explain 5G handoffs, and finally show
+the impact of using 5G on application performance.
+Base 1 2 4 8 16
+# of Parallel TCP Conn.
+Figure 1: TCP perf. under LoS. (a) throughput, (b) RTT.
+4.1
+TCP Performance Under LoS
+We begin with understanding 5G performance when clear
+LoS is present. Specifically, we conduct experiments at Lo-
+cations A, B, and C (§3). At all locations, we ensure that
+we can visually see the 5G panel and there is LoS between
+the phone and the panel. At A and B, we select 5 UE-panel
+distances from 13m to 75m (we use a laser distance meter [7]
+to accurately measure the distance). For each distance, we
+experiment with 3 orientations: 0°, 45°, and 90° (see Figure 2).
+For C, the distance (62m) and orientation (0°) are fixed.
+In each test, we perform TCP bulk download for 60 seconds
+using {1, 2, 4, 8, 16} parallel TCP connections, and measure
+the throughput and RTT every second (reported by iPerf ).
+For all bulk download tests, unless otherwise mentioned, we
+start collecting data 20 seconds after the TCP flow(s) start in
+order to mitigate the impact of TCP slow start. We repeat
+the entire process 3 times. All experiments were conducted
+in clear weather with the phone being held in hand. We
+believe that the above combinations provide realistic and
+diverse environmental configurations of urban 5G access
+from smartphones. In addition, during all experiments, we
+place next to the SGS10 an SGS9 phone to conduct the same
+tests over 4G. We confirm that between the two phones,
+there is no interference that may degrade the performance.
+The two plots in Figure 1 show the measurement results
+of throughput and RTT, respectively, for different numbers
+of concurrent TCP connections. Each boxplot is across all
+1-second measurement samples for a specific setup. We
+make several observations. First, 5G offers much higher
+throughput than 4G. With 8 parallel TCP connections, the
+median 5G and 4G throughputs are 1520 and 147 Mbps, re-
+spectively. However, 5G throughput exhibits much higher
+variations than 4G despite the presence of LoS. This is due
+to the PHY-layer nature of 5G signals as well as potential
+inefficiencies at various layers. For example, at PHY/MAC
+layers, smartphones’ small form factor makes engineering
+5G modem challenging [30]. At the transport layer, an exces-
+sive number of TCP connections may incur cross-connection
+contentions.
+Second, 5G throughput improves as the TCP concurrency
+level increases. Through controlled experiments over wired
+networks and WiFi, we confirm that this is not caused by TCP
+Server Selection. Due to the ultra-high bandwidth of 5G,
+the bottleneck of an end-to-end path may easily shift from
+the wireless hop to the Internet – a situation that seldom
+appears in 3G/4G. Since the focus of our study is 5G, in most
+experiments we do not want such a shift to occur. To ensure
+this, we carefully select a Microsoft Azure server located
+in the U.S. east coast. We justify our selection as follows.
+First, when downloading data from this server, we get the
+highest 5G throughput (statistically) compared to servers in
+other locations or of other cloud providers. Second, when we
+conduct download test from this server to other hosts (e.g.,
+an Amazon cloud instance) over the Internet, we get ∼3 Gbps
+throughput, which is much higher than the highest 5G speed
+we can obtain, during different times of a day. Based on the
+above observations, we have high confidence that for an end-
+to-end path from a UE to our selected server, the Internet
+is unlikely to become the bottleneck. We also measure how
+end-to-end performance (latency and HTTP download time)
+is affected by server selection in §4.1 and §4.4.
+Test Workload. For most of our experiments, we perform
+large bulk data transfers for bandwidth probing. Specifically,
+our UE issues one or more TCP connections or a UDP session
+to download data from an Internet server. Since it is difficult
+to root our UEs, we run the cross-compiled version of iPerf
+3.6 [19] to measure key metrics including throughput, RTT,
+and packet loss rate. We also experiment with two important
+applications: web browsing and HTTP(S) file download over
+5G, with details to be described in §4.4.
+UE-side 5G Monitoring Tool. Due to 5G’s very recent
+debut, we are not aware of any dedicated UE-side monitoring
+tool for it. We therefore develop one that collects the follow-
+ing information to support our measurements: (1) the UE’s
+fine-grained location, (2) all available network interfaces,
+(3) the actively used network interface and its IP address,
+(4) the cell ID (mCID) that the device is connected to, (5) the
+cellular signal strength, and (6) the 5G service status. The
+above information is obtained from Android APIs. Regarding
+the last item (the 5G service status), we find that when the
+UE is connected to 5G, it will be in one of three states: (1) the
+UE is not in 5G coverage area, (2) the UE is in 5G area but is
+connected to 4G due to, for example, poor 5G signals, and
+3First Hop
+East US
+West US
+Panel 1
+RTT (ms) Total RTT Total RTT
+90°
+5G
+27±6.4
+54±4.5
+81±5.5
+Panel 2
+4G
+29±4.8
+58±4.3
+88±5.5
+45° 0°
+Table 1: 1st Hop RTT and impact of server’s
+network location on total (end-to-end) PING
+RTT on 4G/5G. The reported numbers are av- Figure 2:
+Orientation.
+eraged across all runs.
+(a)
+itself. We instead believe that Verizon is imposing per-TCP-
+connection rate limiting over 5G, whose bandwidth appears
+to be fully utilized when there are more than 8 concurrent
+connections. This practice may hurt the performance of
+single-connection protocols such as HTTP/2 [3].
+Third, regarding the latency, 5G and 4G exhibit similar
+base RTT (i.e., end-to-end PING) at around 56 ms. To un-
+derstand how much 5G contributes to this RTT, we perform
+traceroute on the UE to measure the hop-by-hop RTT. As
+shown in Table 1, we find that the first hop RTT, which pre-
+sumably covers the RAN (Radio Access Network), is around
+28 ms for both 4G and 5G, accounting for around 50% of
+the end-to-end RTT. Changing the server location to west
+U.S. reduces this fraction to around 33%. Overall, likely due
+to its NSA model that shares much 4G infrastructure with
+5G, Verizon ’s 5G network provides little improvement of the
+base RTT over 4G. We expect this to be addressed by the SA
+model that may achieve the goal of sub-millisecond RTT.
+We then consider the RTT during a bulk transfer. As
+shown in Figure 1(b), 4G RTT inflates drastically because
+of its deep in-network buffers [15, 17]. Bufferbloat in 5G is
+much less severe, likely due to the fast 5G speed that drains
+the buffer much faster than 4G. Also, 5G exhibits low packet
+loss rates (50%, 75%, 99% percentiles: 0.01%, 0.1%, 1.2%).
+We also study UDP over 5G. Since UDP does not provide
+congestion control, we manually increase the sending rate
+exponentially from 512 Kbps to 2 Gbps. we find that for
+sending rates up to 1 Gbps, the receiver-side loss rate is
+close to 0. This indicates 5G’s compatibility with UDP-based
+protocols such as QUIC [9] and HTTP/3 [4] at these low to
+medium data rates. However, at our test locations, Verizon ’s
+5G is not able to reliably sustain 2 Gbps or a higher sending
+rate over UDP, as we observe a packet loss rate of up to 17%
+at 2 Gbps.
+4.2
+750
+500
+250
+0
+human
+20
+human
+2000
+1000
+(b)
+0
+Handoffs
+4G 5G
+5G 4G
+5G
+4G
+0
+hand
+40
+60
+Timeline (seconds)
+80
+hand
+5G
+4G
+0
+20
+40
+60
+Timeline (seconds)
+80
+Figure 3: Obstruction tests. (a) Location C with ineffective
+multipath, (b) Location A with effective multipath.
+5G-NR panel (62m). We launch a bulk transfer over 5G with
+8 parallel TCP connections. During the data transfer, we
+block the LoS path by a human body and then a hand. We
+repeat the experiments for 10 times and observe qualitatively
+similar results, with one representative run illustrated in
+Figure 3(a). As shown, both obstructions trigger 5G-to-4G
+handoffs and lead to significant performance degradation.
+In contrast, when experimenting with 4G, neither blockage
+incurs noticeable throughput drop (figure not shown), due
+to the low-frequency bands used by 4G signals.
+The above results show that it is difficult for 5G signals
+to penetrate a hand or human body, causing NLoS between
+the transmitter and receiver. We then study other types of
+obstructions using similar methods. We find that when the
+UE is inside a backpack, a cardboard box, or a clear glass, 5G
+signals can penetrate these containers (experimented with
+<100 meters distance to the 5G panel with LoS). However,
+5G signals can hardly penetrate human body, trains, pillar
+structures, and tinted glass. We find that 5G works in vehicles
+since the front windshield is typically clear glass. However,
+when the vehicle is moving, mobility-incurred handoffs may
+considerably degrade 5G performance (§4.3).
+We next repeat the same experiment in Location A, also
+using a human body and a hand as obstructions. As shown in
+Figure 3(b), the impact of the obstructions becomes smaller:
+the 5G connectivity persists despite a fair amount of per-
+formance degradation. Figures 3(a) and (b) indicate that
+the environment can affect the impact of obstructions. At
+Location A, despite the NLoS created by the obstructions,
+the nearby buildings can reflect signals and create multiple
+paths, and the reflected signal can still reach the UE. At Lo-
+cation C, the room has UV-protective windows that are very
+common in today’s buildings. Since the windows attenuate
+reflected 5G signals [43], multipath becomes ineffective. In
+other words, the only effective signal propagation path is
+through the open window. Blocking it inevitably degrades
+the performance.
+Impact of the Environment
+Obstruction and NLoS Performance. The experiments
+in §4.1 assume a clear LoS path without any obstruction. We
+now place different types of objects along the LoS path to
+test whether 5G signals can penetrate/bypass them. We first
+exemplify two most common obstructions: human body and
+hand. We stay at Location C (the Chicago hotel room) with
+an open window through which the phone has LoS to the
+40° 45° 90°
+Orientation Angle (°)
+Figure 4: Impact of UE-
+panel orientation.
+w/ SS
+w/o SS
+2500
+2000
+1500
+1000
+500
+0
+Figure 5 plots the throughput distributions of different
+distances, where each box is across all 1-second samples
+measured at Locations B and D. As shown, the throughput
+only slightly reduces as the distance increases. For 8 paral-
+lel TCP connections, the median throughput decreases by
+only 17% (20%) at 100m (160m) compared to that at 25m. We
+attribute this to the clear LoS and sufficiently high transmis-
+sion power of 5G antennas. For a single TCP connection,
+no noticeable throughput drop is observed because of the
+bandwidth under-utilization.
+Overall, among all factors (obstruction, orientation, and
+distance), obstruction typically incurs the highest impact
+on 5G performance. Fortunately, in urban environments,
+surrounding signal reflections can oftentimes mitigate the
+performance degradation, allowing 5G to function under
+NLoS.
+1 conn.
+8 conn.
+25 50 75 100 160
+Dist. b/ UE & 5G-panel (meters)
+Figure 5: Impact of
+UE-panel distance on
+throughput.
+Impact of UE-panel Orientation. We also investigate
+how the UE’s orientation to the panel affects network per-
+formance. We define the orientation as the minimum angle
+between the LoS and all normal vectors of the base station’s
+panels. As illustrated in Figure 2, an orientation of 0° is pre-
+ferred because the panel is directly facing the UE, while an
+orientation of 90° is the least ideal case. Our orientation test
+is performed at Location D where we can find a large LoS
+area centered by a 5G tower. We pick three spots whose ori-
+entations are 0°, 45°, and 90°. All spots have a 25m distance
+to the tower. At each spot, we perform three 60-second bulk
+download tests using 8 parallel connections. As shown in the
+“w/o SS” boxes in Figure 4 (the default setting of performing
+60-second transfers excluding the slow start), we observe
+very small performance difference between 0° and 45° orien-
+tation, likely attributed to the environmental reflection and
+beamforming. However, in the extreme case where the orien-
+tation becomes 90°, we do observe a median throughput drop
+of 40%. The “w/ SS” boxes correspond to short (25-second)
+measurements from the very beginning of TCP connection
+establishment. They follow a similar trend except that when
+TCP slow start is considered, the throughput becomes lower.
+Impact of UE-Panel Distance. We study how the dis-
+tance between a UE and the panel affects network perfor-
+mance. We conduct the experiment at Location B, where we
+select five spots with their distances to the panel being 25m,
+50m, 75m, 100m, and 160m, respectively. The panel and the
+five spots are on the same line. At each spot, we conduct
+three 60-second bulk download tests using 1 and 8 parallel
+TCP connection(s). During all tests, we ensure that the UE
+is always associated with the same panel, i.e., there is no
+5G-4G or 5G-5G handoff (§4.3). Our test location (B) makes
+this easy: recall that B is at the boundary of Minneapolis’
+5G coverage area; we can therefore increase the UE-panel
+distance by moving the UE away from the coverage area
+without worrying the UE connecting to a different panel.
+Achieving this inside the 5G coverage area is more difficult
+due to the dense deployment of 5G base stations. We find
+that at Location D (near the stadium), the phone can also
+reliably connect to the same panel at a long distance. So we
+conduct our test there as well.
+4.3
+Handoffs in 5G
+Handoffs in 5G differ from those in 4G/3G in both the hori-
+zontal and vertical dimensions. A Horizontal Handoff (HH)
+occurs when a UE’s association switches from one panel (in
+5G’s term) to another. In 5G, HHs may frequently occur due
+to the smaller coverage of 5G panels compared to 4G tow-
+ers. A Vertical Handoff (VH) is triggered when the wireless
+technology changes (e.g., 5G to 4G). VHs are also prevalent
+in 5G whose signals are more unstable than 4G. Handoffs in
+5G are more frequent than 4G due to small coverage of 5G
+base stations and the instability of 5G signals. 5G handoffs
+are also more complex as they involve switching between
+4G and 5G subsystems.
+We closely examine Verizon ’s handoff mechanisms. In 5G
+NSA, a UE may be in one of the three states: (1) the UE is
+connected to 5G, (2) the UE is in 5G coverage area but is
+connected to 4G due to, for example, poor 5G signals, and
+(3) the UE is not in 5G area. We refer to these states as C
+(Connected to 5G), R (Ready for 5G but not yet connected),
+and O (outside 5G coverage), respectively, and we identify
+them by our monitoring tool. We use this state and the cell
+ID field (also collected by our tool) to track both HH and VH.
+Note that in 5G, cell IDs identify 5G-NR panels.
+We then conduct experiments in both cities under various
+mobility levels (stationary, rotating, walking, and driving)
+to capture the above data related to handoffs. We identify 4
+types of primitive handoffs (P1 to P4) as listed in the upper
+part of Table 2. P1 and P2 are VHs because there are handoffs
+between 4G and 5G. When a UE’s 5G signal strength drops
+(e.g., due to an NLoS obstruction), P1 is triggered to down-
+grade the connectivity from 5G to 4G; when the network
+condition improves, the connectivity will be restored back to
+5G (P2). Note that in the 5G-ready (R) mode, the UE actually
+connects to a 4G radio that is on the same tower (where the
+5G-NR panel resides) or a nearby tower, but the cell ID does
+5Description
+VH, 5G→4G, same cellID
+VH, 4G→5G, same cellID
+VH+HH, 5G→4G, diff cellID
+HH, 4G→4G, diff cellID
+Sequence
+C1→R1
+R1→C1
+C1→R2
+R1→R2
+Type
+P1
+P2
+P3
+P4
+10
+7
+4
+1
+Description
+Sequence
+5G temporarily disrupted, same panel
+P1, P2
+5G to 5G between two panels
+P3, P2
+5G to 5G between two panels
+P1, P4, P2
+5G to 4G between two panels
+P1, P4
+4G to 5G between two panels
+P4, P2
+Table 2: Primitive (top) & combinational (bottom) handoffs.
+Type
+O1
+O2
+O3
+O4
+O5
+1000
+Handoff Type:
+P2
+P4
+O1
+Wiki
+588KB
+BingH
+553KB
+GG-I
+2MB
+GG-H
+838KB
+BingI
+741KB
+YT
+2MB
+FoxN CNN
+9MB 15MB
+ebay
+3MB
+Figure 7: 4G/5G PLT over 9 pages: Bing, Wikipedia, Bing
+Search, Google, YouTube, Google Search, eBay, FoxNews,
+CNN.
+O5
+5G
+4G
+500
+0
+P1
+5G
+4G
+0
+50 100 150 200 250 300 350 400 450
+Timeline (in seconds) (Walking a 700m loop in downtown region)
+Figure 6: 5G throughput and handoffs under low mobility.
+not change. This is likely because of NSA where 4G and 5G
+are deeply coupled. At the R state, the UE is still closely mon-
+itoring the original 5G panel for a possible 4G to 5G upgrade.
+P3 is similar to P1 except that the 5G to 4G downgrade ends
+at a different cell ID (panel). P4 is a 4G to 4G HH from one
+cell ID to another. We do not observe a C1→C2 or R1→C2
+sequence in our data. This is likely because NSA uses 4G for
+control-plane signaling – the UE will always first associate
+with the new cell’s 4G radio for control message exchanges
+before establishing the 5G data channel.
+Interestingly, we also find that the (in)activity of user
+traffic can trigger 4G-5G handoffs. A P1 handoff will occur
+when there is an inactivity of user traffic for ∼10 seconds; at
+the R state, any user traffic will restore the 5G connectivity
+through a P2 handoff, if the 5G signal is good. The rationale
+of such traffic-guided handoffs is possibly to reduce the 5G
+standby time that may consume additional energy.
+From our data, we observe that oftentimes the primitive
+handoffs form complex sequences that we call combinational
+handoff sequences. We identify them by clustering primi-
+tive handoffs using an interval threshold (set to 10 seconds).
+They are exemplified at the bottom part of Table 2 as O1 to
+O5. These combinational sequences correspond to high-level
+events that can not be realized by a single primitive handoff.
+For example, O3 represents a 5G-to-5G handoff that consists
+of three primitive handoffs: a 5G to 4G VH on the old panel,
+a 4G to 4G HH from the old to new panel, and a 4G to 5G
+VH on the new panel. The whole procedure takes several
+seconds to finish.
+We next show a case study to demonstrate the impact
+of handoffs. In this experiment, one of the authors holds a
+phone while walking at a normal speed (∼5 km/h) at Loca-
+tion A for about 8 minutes. The phone keeps downloading
+data from a server over 8 parallel connections. Figure 6 plots
+the throughput, cellular connectivity (4G/5G), and hand-
+offs. During this 8-minute walk, the phone experiences 31
+primitive handoffs and bounces between 4G and 5G for 13
+times. Such frequent switches make the throughput highly
+fluctuating, ranging from 0 to 954 Mbps. This may confuse
+applications (e.g., video rate adaptation logic [18, 22, 42]) and
+bring highly inconsistent user experiences. The above results
+highlight the need for cross-layer efforts that improve 5G
+performance under (even low) mobility. Some directions for
+example include PHY/MAC enhancements for reducing the
+handoff frequency, and robust upper-layer solutions that can
+adapt to frequent 4G/5G handoffs, such as MPTCP [24] and
+prefetching [13].
+4.4
+Application Performance
+Web Browsing. We develop a WebView-based browser and
+use it to programmatically load the landing pages of 9 pop-
+ular websites listed in Figure 7 over 5G and 4G. We then
+compare their page loading time (PLT). We conduct the ex-
+periments at Locations A and C with SGS10 (5G) and SGS9
+(4G). In order to make a fair comparison, we confirm that
+both devices yield statistically similar PLT when loading
+diverse web pages locally. In Location A (C), the UE-panel
+distance is 50m (62m) with LoS. For each site, We use an
+automated script to perform cold-cache loading (i.e., with
+an empty web cache) over 5G and 4G back-to-back, and re-
+peat this for 30 times. As shown in Figure 7, for most sites
+with small page sizes (≤ 3 MB), 4G and 5G achieve similar
+PLT. This is attributed to two reasons. First, web brows-
+ing requires a synergy between network transfer and local
+processing, with the latter oftentimes being the bottleneck
+in particular for small web pages [40]. Second, as we load
+the pages from the original content providers, the bottle-
+neck may shift from the wireless hop to the Internet. For
+large pages (FoxNews and CNN), loading them over 5G does
+shorten the median PLT by 17.5% and 23.6%, respectively,
+because of the reduction of the content fetch time.
+6GoogleCDN
+VDMSCDN
+CloudfrontCDN
+AkamaiCDN
+AzureCDN
+AWS-West
+Azure-East
+AWS-East
+Azure-West
+plan to explore them in our future work. Finally, we did not
+address 5G upload performance because Verizon ’s mmWave
+deployment did not support high upload speeds, the highest
+we achieved was 60Mbps.
+Acknowledgement. This research was supported in part
+by NSF under Grants CNS-1618339, CNS-1617729, CNS-1814322,
+CNS-1831140, CNS-1836772, and CNS-1901103.
+Server
+CDN
+0 250 500 750 1000
+Throughput (Mbps)
+REFERENCES
+Figure 8: HTTP(S) download throughput for 9 CDN/cloud
+[1] Omid Abari, Dinesh Bharadia, Austin Duffield, and Dina Katabi. 2017.
+Enabling high-quality untethered virtual reality. In Proceedings of the
+14th USENIX Symposium on Networked Systems Design and Implemen-
+tation. 531–544.
+[2] Christopher R Anderson and Theodore S Rappaport. 2004. In-building
+wideband partition loss measurements at 2.5 and 60 GHz. IEEE trans-
+actions on wireless communications 3, 3 (2004), 922–928.
+[3] M. Belshe, R. Peon, and Ed. M. Thomson. 2015. Hypertext Transfer
+Protocol Version 2 (HTTP/2). RFC 7540. Internet Engineering Task
+Force. https://tools.ietf.org/html/rfc7540
+[4] Mike Bishop. 2019. Hypertext Transfer Protocol Version 3 (HTTP/3)
+(IETF Draft). (2019). Retrieved June 2019 from https://quicwg.org/
+base-drafts/draft-ietf-quic-http.html
+[5] Sylvain Collonge, Gheorghe Zaharia, and G EL Zein. 2004. Influence
+of the human activity on wide-band characteristics of the 60 GHz
+indoor radio channel. IEEE Transactions on Wireless Communications
+3, 6 (2004), 2396–2406.
+[6] Haotian Deng, Chunyi Peng, Ans Fida, Jiayi Meng, and Y Charlie Hu.
+2018. Mobility Support in Cellular Networks: A Measurement Study
+on Its Configurations and Implications. In Proceedings of the Internet
+Measurement Conference 2018. ACM, 147–160.
+[7] Leica Geosystems. 2019. Leica DISTO E7500i LDM. (June 2019).
+Retrieved June 2019 from https://lasers.leica-geosystems.com/disto/
+e7500i
+[8] Marco Giordani, Marco Mezzavilla, and Michele Zorzi. 2016. Initial
+Access in 5G mmWave Cellular Networks. IEEE Communications
+Magazine 54, 11 (2016), 40–47.
+[9] Google. 2019. QUIC, a multiplexed stream transport over UDP. (2019).
+Retrieved June 2019 from https://www.chromium.org/quic
+[10] Yihua Ethan Guo, Ashkan Nikravesh, Z Morley Mao, Feng Qian, and
+Subhabrata Sen. 2017. Accelerating multipath transport through bal-
+anced subflow completion. In Proceedings of the 23rd Annual Interna-
+tional Conference on Mobile Computing and Networking. ACM, 141–
+153.
+[11] Muhammad Kumail Haider, Yasaman Ghasempour, Dimitrios Kout-
+sonikolas, and Edward W Knightly. 2018. Listeer: mmwave beam
+acquisition and steering by tracking indicator leds on wireless aps.
+In Proceedings of the 24th Annual International Conference on Mobile
+Computing and Networking. ACM, 273–288.
+[12] Daniel Halperin, Srikanth Kandula, Jitendra Padhye, Paramvir Bahl,
+and David Wetherall. 2011. Augmenting data center networks with
+multi-gigabit wireless links. In ACM SIGCOMM Computer Communi-
+cation Review, Vol. 41. ACM, 38–49.
+[13] Brett D Higgins, Jason Flinn, Thomas J Giuli, Brian Noble, Christopher
+Peplin, and David Watson. 2012. Informed mobile prefetching. In
+Proceedings of the 10th international conference on Mobile systems,
+applications, and services. ACM, 155–168.
+[14] Anders Hillbur. 2018. 5G deployment options to reduce the complexity.
+(November 2018). Retrieved June 2019 from https://www.ericsson.com/
+en/blog/2018/11/5g-deployment-options-to-reduce-the-complexity
+[15] Junxian Huang, Feng Qian, Yihua Guo, Yuanyuan Zhou, Qiang Xu,
+Z Morley Mao, Subhabrata Sen, and Oliver Spatscheck. 2013. An
+in-depth study of LTE: effect of network protocol and application
+servers over 5G.
+HTTP(S) Download. We investigate the HTTP(S) down-
+load performance. We upload a 1GB file to geographically
+distributed public cloud instances and CDN servers 2 . We
+then develop a custom HTTP(S) client that issues 8 parallel
+byte-range requests each fetching 1/8 of the file over 5G. The
+experiments are conducted at Locations A and C (clear LoS
+with a UE-panel distance of 30m for A and 62m for C, 0° ori-
+entation). For each server, we repeat the file download for 3
+times at both locations, and measure the average throughput.
+The results are shown in Figure 8. We find that all cloud/CDN
+servers exhibit low throughput compared to the iPerf through-
+put shown in Figure 1(a): the average throughput ranges
+from 119 to 730 Mbps with a median of 222 Mbps across all
+servers. The somewhat surprising results make us realize that
+HTTP(S) download is very different from iPerf bandwidth
+probing. Multiple factors may slow down HTTP(S) down-
+load, such as the HTTP request latency, TCP slow start, DNS
+time, Internet-side bottleneck link, server-side data process-
+ing (e.g., HTTP chunked mode and HTTP/2 multiplexing),
+HTTPS encryption/decryption, unbalanced byte-range ses-
+sions (some sessions may finish earlier than others [10]), to
+name a few. Although these factors already exist in 3G/4G
+eras, they are amplified in 5G due to its high speed. The above
+results indicate that 5G’s high throughput does not always
+translate to better app QoE, whose improvement requires
+joint, cross-layer optimizations from multiple sources.
+5
+CONCLUDING REMARKS
+Our study on the world’s first commercial mmWave 5G net-
+work quantitatively reveal 5G performance on COTS smart-
+phones to the community. Our study identifies key research
+directions on improving 5G users’ experience in a cross-layer
+manner. For example, how to design 5G-friendly transport
+protocols? How to strategically select interface(s) among
+5G, 4G, and WiFi? What type of support should a mobile OS
+provide for enhancing QoE over 5G? Meanwhile, we admit
+that this short paper leaves many interesting measurement
+questions unanswered, such as 5G video streaming perfor-
+mance, interaction between 5G and various TCP congestion
+control schemes, and detailed 5G radio energy models. We
+2
+We do not use the CDN servers to perform most measurements in early
+sections because we could not run iPerf on these servers.
+7behavior on performance. In ACM SIGCOMM.
+[16] Junxian Huang, Qiang Xu, Birjodh Tiwana, Z Morley Mao, Ming
+[32]
+Zhang, and Paramvir Bahl. 2010. Anatomizing application perfor-
+mance differences on smartphones. In Proceedings of the 8th interna-
+tional conference on Mobile systems, applications, and services. ACM,
+165–178.
+[17] Haiqing Jiang, Yaogong Wang, Kyunghan Lee, and Injong Rhee. 2012.
+Tackling bufferbloat in 3G/4G networks. In Proceedings of the 2012
+[33]
+Internet Measurement Conference. ACM, 329–342.
+[18] Junchen Jiang, Vyas Sekar, and Hui Zhang. 2012. Improving Fairness,
+Efficiency, and Stability in HTTP-Based Adaptive Video Streaming
+With Festive. In Proceedings of CoNEXT 2012. ACM, 97–108.
+[34]
+[19] ESnet/Lawrence Berkeley National Laboratory. 2019. iperf3: A TCP,
+UDP, and SCTP network bandwidth measurement tool. (June 2019).
+Retrieved June 2019 from https://github.com/esnet/iperf/releases/tag/
+3.6
+[20] Li Li, Ke Xu, Tong Li, Kai Zheng, Chunyi Peng, Dan Wang, Xiangxiang
+[35]
+Wang, Meng Shen, and Rashid Mijumbi. 2018. A measurement study
+on multi-path TCP with multiple cellular carriers on high speed rails.
+In Proceedings of the 2018 Conference of the ACM Special Interest Group
+[36]
+on Data Communication. ACM, 161–175.
+[21] Yuanjie Li, Chunyi Peng, Zengwen Yuan, Jiayao Li, Haotian Deng, and
+Tao Wang. 2016. Mobileinsight: Extracting and analyzing cellular net-
+[37]
+work information on smartphones. In Proceedings of the 22nd Annual
+International Conference on Mobile Computing and Networking. ACM.
+[22] Hongzi Mao, Ravi Netravali, and Mohammad Alizadeh. 2017. Neural
+adaptive video streaming with pensieve. In Proceedings of the Confer-
+[38]
+ence of the ACM Special Interest Group on Data Communication. ACM,
+197–210.
+[23] Motorola. 2019. 5G Moto Mod. (2019). Retrieved June 2019 from
+https://www.motorola.com/us/products/moto-mods/moto-5g
+[39]
+[24] Ashkan Nikravesh, Yihua Guo, Feng Qian, Z Morley Mao, and Sub-
+habrata Sen. 2016. An in-depth understanding of multipath TCP on
+mobile devices: measurement and system design. In Proceedings of
+[40]
+the 22nd Annual International Conference on Mobile Computing and
+Networking. ACM, 189–201.
+[25] Thomas Nitsche, Guillermo Bielsa, Irene Tejado, Adrian Loch, and
+Joerg Widmer. 2015. Boon and bane of 60 GHz networks: practical
+[41]
+insights into beamforming, interference, and frame level operation.
+In Proceedings of the 11th ACM Conference on Emerging Networking
+Experiments and Technologies. ACM, 17.
+[42]
+[26] Thomas Nitsche, Adriana B Flores, Edward W Knightly, and Joerg Wid-
+mer. 2015. Steering with eyes closed: mm-wave beam steering without
+in-band measurement. In Computer Communications (INFOCOM), 2015
+IEEE Conference on. IEEE, 2416–2424.
+[43]
+[27] Joan Palacios, Danilo De Donno, and Joerg Widmer. 2017. Tracking
+mm-Wave channel dynamics: Fast beam training strategies under
+mobility. In Proceedings of the IEEE Conference on Computer Commu-
+nications.
+[28] Hang Qiu, Fawad Ahmad, Fan Bai, Marco Gruteser, and Ramesh Govin-
+[44]
+dan. 2018. AVR: Augmented Vehicular Reality. In Proceedings of the
+16th Annual International Conference on Mobile Systems, Applications,
+and Services. ACM, 81–95.
+[29] Qualcomm. 2019. Everything You Need to Know About 5G. (2019).
+[45]
+Retrieved June 2019 from https://www.qualcomm.com/invention/5g/
+what-is-5g
+[30] Qualcomm. 2019.
+Mobilizing mmWave for smart-
+phones.
+(2019).
+Retrieved June 2019 from
+[46]
+https://www.qualcomm.com/news/onq/2019/02/13/
+track-solve-another-impossible-challenge-mobilizing-mmwave-smartphones
+[31] Theodore S Rappaport, Eshar Ben-Dor, James N Murdock, and Yijun
+Qiao. 2012. 38 GHz and 60 GHz angle-dependent propagation for
+8
+cellular & peer-to-peer wireless communications. In Communications
+(ICC), 2012 IEEE International Conference on. IEEE, 4568–4573.
+Theodore S Rappaport, Felix Gutierrez, Eshar Ben-Dor, James N Mur-
+dock, Yijun Qiao, and Jonathan I Tamir. 2013. Broadband millimeter-
+wave propagation measurements and models using adaptive-beam
+antennas for outdoor urban cellular communications. IEEE transac-
+tions on antennas and propagation 61, 4 (2013), 1850–1859.
+Theodore S Rappaport, Shu Sun, Rimma Mayzus, Hang Zhao, Yaniv
+Azar, Kevin Wang, George N Wong, Jocelyn K Schulz, Mathew Samimi,
+and Felix Gutierrez. 2013. Millimeter wave mobile communications
+for 5G cellular: It will work! IEEE access 1 (2013), 335–349.
+Wonil Roh, Ji-Yun Seol, Jeongho Park, Byunghwan Lee, Jaekon Lee,
+Yungsoo Kim, Jaeweon Cho, Kyungwhoon Cheun, and Farshid Aryan-
+far. 2014. Millimeter-wave beamforming as an enabling technology
+for 5G cellular communications: theoretical feasibility and prototype
+results. IEEE Communications Magazine 52, 2 (2014), 106–113.
+Clayton Shepard, Ahmad Rahmati, Chad Tossell, Lin Zhong, and
+Phillip Kortum. 2011. LiveLab: measuring wireless networks and
+smartphone users in the field. ACM SIGMETRICS Performance Evalua-
+tion Review 38, 3 (2011), 15–20.
+Sanjib Sur, Ioannis Pefkianakis, Xinyu Zhang, and Kyu-Han Kim. 2017.
+WiFi-Assisted 60 GHz Wireless Networks. In MobiCom.
+Sanjib Sur, Vignesh Venkateswaran, Xinyu Zhang, and Parmesh Ra-
+manathan. 2015. 60 ghz indoor networking through flexible beams:
+A link-level profiling. In ACM SIGMETRICS Performance Evaluation
+Review, Vol. 43. ACM, 71–84.
+Zhaowei Tan, Yuanjie Li, Qianru Li, Zhehui Zhang, Zhehan Li, and
+Songwu Lu. 2018. Supporting mobile VR in LTE networks: How close
+are we? Proceedings of the ACM on Measurement and Analysis of
+Computing Systems 2, 1 (2018), 8.
+Xiaozheng Tie, Kishore Ramachandran, and Rajesh Mahindra. 2012.
+On 60 ghz wireless link performance in indoor environments. In Pas-
+sive and Active Measurement. Springer, 147–157.
+Xiao Sophia Wang, Aruna Balasubramanian, Arvind Krishnamurthy,
+and David Wetherall. 2013. Demystifying page load performance
+with WProf. In Presented as part of the 10th {USENIX} Symposium on
+Networked Systems Design and Implementation ({NSDI} 13). 473–485.
+Hao Xu, Vikas Kukshya, and Theodore S Rappaport. 2002. Spatial and
+temporal characteristics of 60-GHz indoor channels. IEEE Journal on
+selected areas in communications 20, 3 (2002), 620–630.
+Xiaoqi Yin, Abhishek Jindal, Vyas Sekar, and Bruno Sinopoli. 2015. A
+control-theoretic approach for dynamic adaptive video streaming over
+HTTP. In ACM SIGCOMM Computer Communication Review, Vol. 45.
+ACM, 325–338.
+Hang Zhao, Rimma Mayzus, Shu Sun, Mathew Samimi, Jocelyn K
+Schulz, Yaniv Azar, Kevin Wang, George N Wong, Felix Gutierrez Jr,
+and Theodore S Rappaport. 2013. 28 GHz millimeter wave cellular
+communication measurements for reflection and penetration loss in
+and around buildings in New York city.. In ICC. 5163–5167.
+Xia Zhou, Zengbin Zhang, Yibo Zhu, Yubo Li, Saipriya Kumar, Amin
+Vahdat, Ben Y Zhao, and Haitao Zheng. 2012. Mirror mirror on the
+ceiling: Flexible wireless links for data centers. ACM SIGCOMM
+Computer Communication Review 42, 4 (2012), 443–454.
+Yibo Zhu, Zengbin Zhang, Zhinus Marzi, Chris Nelson, Upamanyu
+Madhow, Ben Y Zhao, and Haitao Zheng. 2014. Demystifying 60GHz
+outdoor picocells. In Proceedings of the 20th annual international con-
+ference on Mobile computing and networking. ACM, 5–16.
+Yibo Zhu, Xia Zhou, Zengbin Zhang, Lin Zhou, Amin Vahdat, Ben Y
+Zhao, and Haitao Zheng. 2014. Cutting the cord: a robust wireless
+facilities network for data centers. In Proceedings of the 20th annual
+international conference on Mobile computing and networking. ACM,
+581–592'"
+1,"'Multi-antenna technologies are the key enabler for unlocking the potential of millimeter-wave (mm-wave) spectrum
+bands in 5G-and-beyond networks [1], [2]. A number of
+mm-wave outdoor measurement campaigns, predominantly
+using channel sounder setups with horn antennas, e.g. [3]–[9],
+have now demonstrated the fundamental feasibility of mmwave links in urban environments and resulted in mm-wave
+statistical channel models (see [10] and references therein).
+This year has also seen the first test commercial mm-wave
+outdoor deployments, albeit with limited capabilities and performance [11]. Directional high-gain antenna beams are used
+to overcome the high path loss at mm-wave frequencies, but
+the sensitivity to misalignment of antenna beams [6], [12]
+and the effect of link blockage due to environmental and
+mobile obstacles such as buildings [13] and humans [14],
+remain primary challenges for seamless coverage in large-scale
+mobile network deployments. The key to making mm-wave
+All authors are with the Institute for Networked Systems, RWTH Aachen
+University, Kackertstrasse 9, 52072 Aachen, Germany.
+E-mail: {lku, aic, pma, lsi}@inets.rwth-aachen.de.
+cellular networks a reality is thus exploiting multi-antenna
+technology for robust and precise beamsteering to overcome
+effects of blockage and beam misalignment caused by large
+and small-scale mobility, and provide seamless gigabit-persecond (Gbps) connectivity.
+Great advances have been reported in the literature regarding
+mm-wave antenna technology [15]–[17], but the evaluation of
+these devices has been largely conducted in controlled indoor
+environments. The notable exceptions to this are [18]–[21],
+which demonstrated outdoor coverage measurements using
+mm-wave phased antenna arrays. However, these works lack
+fine-grained angle-of-arrival (AoA) and angle-of-departure
+(AoD) measurements, which are crucial for understanding
+the impact of beam misalignment on mm-wave link and network performance. Other prior outdoor measurement studies,
+e.g. [3]–[9], used horn antenna or omni-directional antenna
+setups. The existing literature thus offers very limited insight
+on the performance of mm-wave antenna arrays in a real
+outdoor urban network environment, in particular with respect
+to the beamsteering opportunities and beam misalignment
+effects, which is an essential input for system-level engineering
+design of future mm-wave networks.
+In this paper, we present the first large-scale outdoor urban
+mm-wave measurement study using a state-of-the-art phased
+antenna array, collecting received signal strength (RSS) data
+over systematic fine-grained 3D AoA and AoD orientations
+in a typical European town. We study the impact of phased
+antenna arrays in terms of the number of link opportunities,
+achievable data rate and robustness under small-scale mobility,
+and directly compare this against reference measurements
+using a horn antenna. Our results show a limited number of
+2–4 available distinct spatial link opportunities per receiver
+location, indicating that the mm-wave multipath richness in a
+typical European town center is surprisingly similar to that in
+dense urban areas as presented in [3]–[5], [7], [9]. The results
+for the phased antenna array reveal that losses in estimated data
+rate of up to 70% occur for small beam misalignments in the
+order of the half-power beamwidth (HPBW), with significant
+and irregular variations in estimated data rate for larger beam
+misalignments due to the non-ideal phased antenna array
+radiation pattern. By contrast, the loss in estimated data rate
+for the horn antenna setup is monotonically increasing with the
+orientation error. This shows that earlier measurement studies
+[6], [12] or theoretical studies [22], [23] of beam misalignment
+effects on mm-wave link and network performance using horn
+antennas or idealized directional antenna patterns cannot be
+arXiv:1909.12024v1 [eess.SP] 26 Sep 2019
+2
+simply generalized. Consequently, we analyze the implications
+that our results have on the design for future beamsteering
+algorithms in mm-wave outdoor network deployments.
+The rest of the paper is organized as follows. Sec. II gives
+the related work overview. Sec. III presents our measurement
+setup and methodology. Our measurement results are presented
+and analyzed in Sec. IV. In Sec. V we discuss the engineering
+implication of our findings for outdoor mm-wave network
+deployments. Finally, Sec. VI concludes the paper.
+II. RELATED WORK
+Recent years have seen great advances in mm-wave phased
+antenna arrays and corresponding transceivers for base stations
+(BSs) and user equipment (UE). For instance, Samsung [17]
+has presented a 28 GHz base station with a 64-element phased
+antenna array, IBM and Ericsson [15] have demonstrated a
+dual-polarized 28 GHz phased antenna array module with 128
+elements, and Sivers IMA has released 16-element mm-wave
+phased antenna array [16]. However, these new mm-wave
+transceivers and phased antenna array designs have largely
+been evaluated in controlled environments [15]–[17], rather
+than in real outdoor urban settings. Notable exceptions to
+this are the studies in [18]–[21]. In [18], [19], and [20] data
+rate measurements with 28 GHz multi antenna arrays were
+conducted in outdoor environments, analyzing the possible
+coverage in potential mm-wave cells. Yet, these studies did not
+include detailed AoA or AoD measurements, which are central
+to understanding the impact of non-ideal, mm-wave phased
+antenna arrays on the design of beamsteering algorithms for
+mm-wave networks. In [21] the RSS over AoD was measured
+at several receiver positions in a car park using an omnidirectional antenna at the receiver and a 60 GHz phased
+antenna array at the transmitter side, finding strong reflected
+paths for many receiver positions. However, [21] did not
+investigate beamsteering opportunities and limitations caused
+by beam misalignment, due to the lack of AoA data. By
+contrast, in this work we present the results of the first
+comprehensive large-scale urban measurement campaign with
+mm-wave phased antenna arrays systematically collecting RSS
+over fine-grained AoA and AoD antenna orientations.
+Independently from the advances in mm-wave multi-antenna
+technology, a number of mm-wave measurement campaigns
+have been conducted in outdoor environments with the aim
+of establishing statistical mm-wave channel models (see [2]
+and references therein). Rappaport et al. [3] conducted seminal measurements at 28, 38, 60 and 70 GHz in Austin,
+Texas, and New York City using a sliding correlator channel
+sounder with mechanically steerable horn antennas to record
+the power delay profile for a limited selected range of AoA and
+AoD combinations at each TX/RX pair. Similar measurement
+methodologies have been employed in other measurement
+campaigns, e.g. [4], [5], [7]–[9], and measurement-based statistical channel models such as the NYU model [25] have
+consequently been proposed (see [10] and references therein).
+Overall, analyzing the number of potential link opportunities,
+the studies in [3]–[5], [7], [9] reported a limited number of
+2–5 mm-wave multipath clusters per TX/RX pair for urban
+areas in different metropolises. However, as these measurements campaigns were conducted with horn or omnidirectional
+antenna setups, they do not allow us to study the impact of
+phased antenna arrays on potential link opportunities and beam
+misalignment in mm-wave networks. By contrast, in this work
+we collected RSS data with mm-wave phased antenna arrays
+over fine-grained AoA and AoD sample points to study these
+open questions. Additionally, we conducted measurements in a
+typical European town rather than a big city like prior studies
+in the literature.
+Lee et al. [12] studied the effect of beam misalignment
+based on measurements taken with a channel sounder and horn
+antennas. To that end, power measurements were systematically collected across azimuth angles at 28 and 38 GHz in both
+free-space and urban environments. The general conclusion
+based on these horn antenna measurements was that for a fixed
+beamwidth, the power loss increases linearly with increasing
+beam misalignment until saturation is reached. This confirms
+the results of Simic´ et al. in [6], where the RSS over AoA
+and AoD was systematically measured with a horn antenna
+setup in an urban environment in the 60 GHz band. The
+results in [6], [12] stand in stark contrast to the results of our
+phased antenna array measurements in this paper, which show
+a non-linear relationship between misalignment and power
+loss. To demonstrate that this is caused by the non-ideal,
+phased antenna array pattern, we also explicitly compare our
+measurements against those with a horn antenna in the same
+outdoor scenarios. Our comparison underlines the paradigm
+shift that occurs in terms of beam misalignment effects when
+moving from horn antennas to real phased antenna arrays.
+In addition to empirical research, the effect of beam misalignment on mm-wave network performance has also been
+addressed from a theoretical perspective, e.g. in [22], [23].
+These approaches typically make use of simple and idealized
+antenna radiation pattern models to investigate the effect of
+fundamental antenna parameters such as beamwidth on various
+metrics of system performance. Moreover, analyses regarding
+beam misalignments have mainly focused on misalignments
+smaller than the main lobe beamwidth [22]. Wildman et al.
+[23] do consider larger beam misalignments from a theoretical
+perspective and show that in theory sidelobes can be beneficial
+to the success probability of a transmission in low density networks and that the spatial throughput and transmission capacity maximizing beamwidth has a nearly linear relationship with
+the mean orientation error for Gaussian and sectored antenna
+radiation pattern models. As such idealized radiation pattern
+models are much more similar to a horn antenna radiation
+pattern than that of a real mm-wave phased antenna array,
+our results strongly suggest that such a linear relationship will
+not hold in real mm-wave deployments and that the severe
+consequences of this idealization on the requirements and
+opportunities of beamsteering algorithms and network system
+design have been underestimated. Therefore, our work forms
+a basis for realistic models of beam misalignment effects in
+urban 5G-and-beyond mm-wave networks.
+3
+Transmitter position
+RX C
+Receiver position
+RX B
+RX A
+RX D
+TX 1
+TX 2
+B
+D
+Fig. 1: Aerial view of the TX (1-2) and RX positions (A-D),
+with the initial antenna orientations indicated by an arrow.
+The measurement scenarios are listed in Table I. (Photo
+courtesy of [26]).
+III. MEASUREMENT SETUP & METHODOLOGY
+Our outdoor measurement campaign was conducted in the
+German town of Langenfeld. The measurement area constitutes the central pedestrian zone with mainly shops in the
+surroundings and only delivery trucks being allowed to enter.
+The buildings typically have 2-5 floors and are constructed
+of concrete with large windows and some metal parts on the
+facades. The measurements were conducted over the course
+of 12 days during the summer of 2018, with dry weather and
+temperatures of around 25◦ C.
+The transmitter (TX) was located at different positions on
+the rooftop of a multi-floor car park at a height of 9.7 m. The
+receiver (RX) positions A–D were located in the pedestrian
+zone, i.e. on ground level, with the mounted antenna at a height
+of 1.7 m. Fig. 1 shows an aerial image of the area where
+the TX positions (1, 2) and RX positions (A, B, C, D) are
+marked. Fig. 2 shows the different TX and RX positions during
+the measurements. The RX is circled in green and the TX in
+orange. In case the LOS is blocked, a green square indicates
+the geometric LOS direction. The positions were chosen based
+on representative scenarios as follows:
+• TX1-RXA: Typical scenario for small cell, with clear LOS
+and TX-RX distance of 25 m (Figs. 2a-2b).
+• TX1-RXB and TX2-RXB: RX-B was chosen to investigate
+the effects of an obstructed LOS and evaluate the coverage from different TX positions for the same RX position.
+In scenario TX1-RXB the LOS is partially blocked by
+a building corner, while in scenario TX2-RXB the LOS
+is partially blocked by a lamp-post with a flower box
+mounted on it (Figs. 2c-2f).
+• TX1-RXC: Represents a typical street canyon with 18 m
+width and buildings to the left and to the right. The
+large TX-RX distance of 65 m makes this representative
+of cell-edge distances in a mm-wave small cell. The
+LOS path was predominantly clear despite tree foliage
+(Figs. 2g-2h).
+• TX2-RXD: Scenario chosen to investigate the effect of tree
+foliage on mm-wave coverage, with a TX-RX distance
+of 28 m and clearly visible trees obstructing the LOS
+(Figs. 2i - 2j).
+For our measurement campaign we used two different
+60 GHz transceiver setups, one utilizing a phased antenna
+array and the other utilizing a standard horn antenna for
+comparison. A relatively narrowband signal transmission was
+chosen (1 MHz) to obtain fine-grained RSS and angle orientation data, allowing us to have a robust setup that does
+not require strict calibration as the gain over the frequency
+band is flat and the time-component of the channel is not
+recorded. Importantly, since we are not interested in a timecharacterization of the channel, the narrowband power measurements are sufficient for our objective of characterizing
+mm-wave link opportunities in a typical outdoor environment
+and beamsteering requirements for maintaining a reliable link
+connectivity under small-scale mobility. Both setups utilize
+software-defined radios (SDRs), facilitating transport and use
+in different locations. We note that the frequency bands in
+the range of 24–86 GHz are under consideration for 5G-andbeyond mm-wave cellular networks [27]. In this paper, we
+report measurements in the 60 GHz band without the loss of
+generality, due to equipment availability and for comparability
+with prior mm-wave outdoor urban measurement studies,
+e.g. [3], [6], [18], [21].
+A. Phased Antenna Array Setup
+We used the SiversIMA 60 GHz phased antenna array radio
+frequency integrated circuit (RFIC) TRX BF/01 [24] with the
+corresponding evaluation kit EVK06002 [28]. The setup is
+capable of operating in the frequency range from 57 GHz–
+71 GHz. The included RF module uses direct conversion in
+both TX and RX mode. It includes a 16+16 (TX/RX) patch
+antenna module, with each antenna array consisting of 16×2
+microstrip patch antenna elements directly connected to the
+RFIC [16]. Fig. 3a shows a schematic drawing of the phased
+antenna array board and the RFIC. The phase weights and
+amplitudes are applied to the signal in the analog RF domain
+using 16 independent RF paths. Thus, only azimuth plane
+beamsteering is allowed in the range [+45◦
+, −45◦
+], based on a
+codebook with up to 64 different antenna pattern entries. The
+phased array transceiver was controlled via a USB interface.
+Figs. 3c-3d compare the measured phased antenna array radiation pattern with the simulated one obtained using
+MATLAB’s phased antenna array toolbox based on generic
+patch antenna elements. We note the considerable differences
+between the ideal simulated radiation pattern and the real, nonideal measured radiation pattern.
+4
+(a) TX 1 seen from RX A. (b) RX A seen from TX 1. (c) TX 1 and RX B. (d) RX B seen from TX 1. (e) TX 2 seen from RX B.
+(f) RX B seen from TX 2. (g) TX 1 seen from RX C. (h) RX C seen from TX 1. (i) TX 2 and RX D. (j) RX D seen from TX 2.
+Fig. 2: TX and RX in different positions during measurements. The RX is circled in green and TX in orange. In case the
+LOS is blocked, a green square indicates the geometric LOS direction.
+y
+x
+2a
+(a) Phased antenna array
+board with a = 0.71mm,
+y = 2.4mm, x = 2.97mm.
+0
+◦
+30◦
+60◦
+90◦
+120◦
+150◦
+180◦ 210◦
+240◦
+270◦
+300◦
+330◦
+−40 dBi
+−30 dBi
+−20 dBi
+−10 dBi
+0 dBi
+10 dBi
+20 dBi
+H-plane E-plane
+(b) The simulated horn antenna
+power pattern.
+0
+◦
+30◦
+60◦
+90◦
+120◦
+150◦
+180◦ 210◦
+240◦
+270◦
+300◦
+330◦
+−50 dB
+−40 dB
+−30 dB
+−20 dB
+−10 dB
+0 dB
+Measurement Simulation
+(c) The phased antenna array
+H-plane power pattern normalized
+to unity at the maximum.
+0
+◦
+30◦
+60◦
+90◦
+120◦
+150◦
+180◦ 210◦
+240◦
+270◦
+300◦
+330◦
+−50 dB
+−40 dB
+−30 dB
+−20 dB
+−10 dB
+0 dB
+Measurement Simulation
+(d) The phased antenna array
+E-plane power pattern normalized to
+unity at the maximum.
+Fig. 3: Schematic drawing of the SiversIMA TRX BF/01
+phased antenna array board and antenna radiation patterns.
+The schematic of the overall phased antenna array setup
+is shown in Fig. 4. The left part of the figure shows the
+TX including host PC 1, USRP X310 SDR with LFTX
+daughterboards, and the phased antenna array transceiver.
+The right part of the figure shows the RX consisting of an
+equivalent setup. The host PC 1 generates a complex sinusoidal
+signal at the frequency fsin = 250 kHz and streams it to the
+USRP. The USRP generates a baseband signal with a sampling
+rate fs = 1 MHz which is fed to the phased antenna array
+transceiver. The phased antenna array transceiver upconverts
+the signal to a frequency fc = 58.32 GHz, and transmits the
+signal over the air. The RX phased antenna array downconverts
+the received signal and feeds it to the USRP, which samples the
+signal with a sampling rate fs = 1 MHz. The complex samples
+are streamed to the host PC 2, where the power spectrum of the
+received signal is computed using a flattop window. Finally,
+the signal strength RSSA,meas of the received sinusoidal signal
+is extracted from the power spectrum, which was calibrated
+against an Agilent E4440A spectrum analyzer.
+B. Horn Antenna Setup
+For comparison, our second setup used the FC1005V/00
+V-band converter by SiversIMA [29] and a standard 15 dBi
+gain horn antenna by Flann Microwave [30]. The FC1005V/00
+is capable of up- and downconverting to and from 57-66 GHz
+using an intermediate frequency (IF) bandwidth of 1-5 GHz.
+Fig. 3b shows the simulated radiation pattern of the standard
+gain horn antenna.
+The schematic of the horn antenna setup is shown in Fig. 5.
+The left part of the figure shows the TX including the host
+PC 1, USRP N210 with WBX daughterboard, Sivers IMA
+FC1005V/00 upconverter and the horn antenna. The right part
+of the figure shows the RX consisting of a similar setup
+as the TX. The transmission and reception signal chain of
+the horn antenna setup is equivalent to the phased antenna
+array setup (cf. Sec. III-A), except that the signal between the
+USRP and up-/downconverter is at the intermediate frequeny
+fIF = 1.32 GHz and not at baseband. The RSS at the horn
+antenna setup RSSH,meas was obtained by the same calibrated
+procedure as described in Sec. III-A.
+5
+Host PC 1 USRP
+X310
+USRP
+X310 Host PC 2
+d
+TX RX
+TRX BF/01 TRX BF/01 Sivers IMA Sivers IMA
+& EVK06002 & EVK06002
+Fig. 4: Schematic of the phased antenna array setup. Link distance d depends on the TX/RX locations.
+Host PC 1 USRP
+N210
+SiversIMA
+FC1005V/00
+SiversIMA
+FC1005V/00
+USRP
+N210 Host PC 2
+d
+TX RX
+Fig. 5: Schematic of the horn antenna setup. Link distance d depends on the TX/RX locations.
+(a) 3D turntable with mounted
+antenna array transceiver
+-180°
+-45°
+ 45°
+-45°
+ 45° -45°
+ 45°
+-45°
+27°
+180°
+-90°
+-84°
+6° 12°
+102°
+108°
+-135°
+-39°
+57°
+153°
+Beamsteering
+Turntable
+Total
+(b) Combination of mechanical
+turntable angle φt t and electronic
+beamsteering angle φbeam used for
+the receiver azimuth angle φRX
+Fig. 6: Automated 3D turntable with mounted antenna array
+transceiver used in the measurements.
+C. Measurement Procedure
+To identify potential link opportunities and their respective
+antenna orientations (AoD, AoA), we systematically swept the
+angular space by changing the beam orientations at the TX and
+RX. Each beam orientation can be characterized by a pair of
+azimuth and elevation angles (φ, θ). As the phased antenna
+array transceiver only allows beamsteering in a 90◦
+azimuth
+range and the horn antenna setup cannot electronically steer
+its beam, we have used a custom made 3D turntable to help
+cover the complete angular space with additional mechanical
+movements when the range of electronic beamsteering was
+exceeded. The turntable uses two stepper motors for azimuth
+and elevation movement. The automated 3D turntable with the
+mounted phased antenna array transceiver is shown in Fig. 6a.
+1) Phased Antenna Array Transceiver: For the measurements, we covered all orientations within azimuth
+φRX ∈ [−180◦
+, 180◦
+) and elevation θRX ∈ [−30◦
+, 60◦
+] at
+each RX position. The range of elevation angles was chosen
+based on observation of potential link opportunities, taking
+into account the positioning of the TX and RX. The elevation
+resolution of ∆θRX = 30◦ was chosen based on the E-plane
+HPBW of 36◦
+found in the phased antenna array radiation
+pattern measurements (cf. Fig. 3d). The azimuth resolution
+was chosen to be ∆φ = 6
+◦
+corresponding to the HPBW of the
+azimuth-plane radiation pattern (cf. Fig. 3c). To change the
+azimuth angle orientation at the RX, we used a combination of
+mechanical movement by the 3D turntable and the electronic
+beamsteering, φRX = φtt + φbeam, as shown in Fig. 6b.
+The measurement time per RX orientation (φRX, θRX) was
+1 second. A complete sweep over all RX orientations for a
+single fixed TX orientation took 500 s.
+Once such an RX sweep was finished, the TX changed
+its azimuth orientation and another RX measurement run
+was started. Analogously to the RX, the transmitting phased
+antenna array transceiver was mounted on a 3D turntable, with
+the elevation angle fixed to θT X = −15◦ based on the large
+E-Plane HPBW and the higher positioning on the rooftop
+of a parking lot. The azimuth angle of the TX orientation
+was changed in ∆φT X = 6
+◦
+steps by a combination of
+mechanical turntable movement and electronic beamsteering,
+as described previously. The range of azimuth angles to be
+covered was chosen to be φT X ∈ [−90◦
+, 84◦
+] w.r.t. the initial
+TX antenna orientation. Hence, the total measurement time for
+all TX/RX combinations with the phased antenna array setup
+was 30×500 s, or 4 hours and 10 minutes. The overall angular
+coverage per position is presented in Table I.
+2) Horn Antenna Array Transceiver: To mechanically steer
+the transceiver in various orientations, the horn antenna RX
+setup was mounted on a 3D turntable, similar to that shown
+in Fig. 6a for the phased antenna array. For the measurements,
+we chose to cover all RX azimuth angles φRX ∈ [−180◦
+, 180◦
+)
+with a resolution ∆φRX = 6
+◦
+, identical to the phased antenna
+array setup, so that the obtained results can be readily compared. Furthermore, we chose to cover the range of elevation
+angles θRX ∈ [−30◦
+, 60◦
+] with a higher resolution than for the
+phased antenna array setup, i.e. ∆θRX = 10◦
+, to allow a finergrained identification of AoA and identify potential scattering
+or reflecting objects. On the transmitter side, the horn antenna
+setup was also mounted on a 3D turntable and the elevation
+angle was fixed to θT X = −15◦
+, as used for the phased antenna
+array and in accordance with the broad E-Plane HPBW of 34◦
+(cf. Fig. 3b).
+A measurement run for a fixed transmitter orientation took
+considerably longer using the horn antenna setup than using
+the phased antenna array setup, due to the fact that all movements in elevation or azimuth were achieved by mechanical
+movement of the 3D turntable. To strike a balance between the
+time spent for measurements with each setup, we limited the
+range of horn antenna TX azimuth angles per measurement
+position, ensuring that a minimum range of 54◦
+centered
+6
+TABLE I: Measurements scenarios with ID consisting of a number (TX position), capital letter (RX position) and small letter
+(setup: (a) phased antenna array and (h) horn antenna). The distance d is the 3D link distance. Nmeas,tot is the total number
+of measured TX/RX beam orientation combinations.
+ID TX RX d (m) Type Setup θT X(
+◦
+) φT X(
+◦
+) θRX(
+◦
+) φRX(
+◦
+) Nmeas,tot
+1Aa 1 A 25.3 LOS Array -15 -90:6:84 -30:30:60 -180:6:174 7200
+1Ah 1 A 25.3 LOS Horn -15 -54:6:42 0:10:60 -180:6:174 7140
+1Ba 1 B 43.8 NLOS Array -15 -90:6:84 -30:30:60 -180:6:174 7200
+1Bh 1 B 43.8 NLOS Horn -15 -54:6:6 0:10:60 -180:6:174 4620
+1Ca 1 C 64.9 LOS Array -15 -90:6:84 -30:30:60 -180:6:174 7200
+1Ch 1 C 64.9 LOS Horn -15 -24:6:30 -30:10:60 -180:6:174 6000
+2Da 2 D 27.8 NLOS Array -15 -72:6:52 -30:30:60 -180:6:174 5200
+2Ba 2 B 63.2 NLOS Array -15 -90:6:84 -30:30:60 -180:6:174 7200
+TABLE II: System parameters of the antenna setups and the
+wideband 5G NR system model.
+Horn ant.
+setup
+Phased ant.
+array setup
+Wideband
+5G-NR
+model
+Main lobe gain G (dBi) 15 16 –
+EIRP (dBm) 9.61 3.95 25
+Sensitivity S (dBm) -91 -104 -74.4
+around the LOS direction was systematically covered with
+a ∆φT X = 6
+◦ granularity. The overall angular coverage per
+position is presented in Table I.
+D. Post-Processing of Measurement Data
+In our analysis in Sec. IV, we take two different perspectives
+on our measurement results. First, we study the link opportunities in a typical European town in Sec. IV-A, i.e. we are
+essentially interested in the path loss that a signal experiences
+between TX and RX for different antenna orientations. Therefore, we present the RSS of both measurement setups for
+a normalized nominal link budget so as to eliminate effects
+that may occur due to different antenna gains or different
+equivalent isotropically radiated powers (EIRPs) between the
+measurement setups. Second, we estimate the achievable data
+rate in mm-wave cells to analyze the effect of beam misalignment on the link performance, presented in Sec. IV-B. To this
+end, we assume the TX to be a BS operating at a fixed EIRP,
+and estimate the achievable data rates at the receiving UE
+based on our measurements. In the following, we detail the
+post-processing steps taken to obtain the data presented in
+Sec. IV-A and Sec. IV-B from our RSS measurements.
+RSS with Normalized Nominal Link Budget: We obtain the
+normalized RSS for the phased antenna array setup RSSA
+and the horn antenna setup RSSH from the measured RSS
+RSSA,meas and RSSH,meas, respectively, by making equal the
+nominal link budget for both measurement setups, i.e.
+RSSA = RSSA,meas + Cc, (1)
+RSSH = RSSH,meas . (2)
+The constant Cc is the difference between the actual link
+budgets of the measurement setups, i.e.
+Cc = E IRPH + GH − (E IRPA + GA), (3)
+where E IRPH and E IRPA are the EIRPs of the horn antenna
+setup and the phased antenna array setup during the measurements, respectively, and GH and GA are the estimated main
+lobe antenna gains of the horn antenna and the phased antenna
+array, respectively. The values of these parameters are given
+in Table II. We note that the validity of our results is not
+compromised by this operation as the sensitivity of the phased
+antenna array setup SA,meas was considerably lower than the
+sensitivity of the horn antenna setup SH,meas. The sensitivity
+of our overall measurement system after the normalization is
+still limited by the horn antenna measurement setup, i.e.
+S = max{SH,meas, SA,meas + Cc } = −91 dBm. (4)
+The normalized received signal strengths RSSA and RSSH
+obtained after this post-processing operation are presented in
+Sec. IV-A .
+Estimating Achievable Data Rate: To analyze the effect
+of beam misalignment on the link performance in mmwave cells, we mapped RSSA,meas and RSSH,meas to the
+estimated achievable data rate T, assuming a fixed BS EIRP
+of E IRPBS = 25 dBm, in line with existing regulations for
+wideband transmissions at 60 GHz [31]. First, the measured
+received signal strengths RSSA,meas and RSSH,meas were
+scaled according to the additional power that receivers would
+receive for a BS transmitting with E IRPBS, i.e.
+RSS0
+A = RSSA,meas + (E IRPBS − E IRPA), (5)
+RSS0
+H = RSSH,meas + (E IRPBS − E IRPH ). (6)
+The overall sensitivity S
+0 of our overall measurement system
+is then given by
+S
+0 = max{SH,meas + (E IRPBS − E IRPH ),
+SA,meas + (E IRPBS − E IRPA)} (7)
+= −75.61 dBm. (8)
+To then map RSS0
+A
+and RSS0
+H
+to the estimated, achievable
+data rate T for a wideband system, we used the Verizon 5GNR model which demonstrated a maximum throughput of
+4 Gbps using an 800 MHz bandwidth [32]. An attenuated and
+7
+truncated version of the Shannon bound is used as a mapping
+function, similar to those used for modeling of link adaption
+in LTE [33] and for 5G NR coexistence in [34], i.e.
+T =
+
+
+
+0 for SN R < SN Rmin,
+αW log2
+(1 + SN R)
+for SN Rmin ≤ SN R
+and SN R ≤ SN Rmax,
+Tmax for SN R > SN Rmax,
+(9)
+where W = 800 MHz denotes the system bandwidth,
+α = 0.75 is the correction factor to account for implementation losses, SN Rmin = −4.5 dB, and SN Rmax = 20 dB1
+.
+The modeled receiver is assumed to have a noise figure of
+NF = 10 dB and implementation loss of LI = 5 dB such that
+the SNR is calculated from our data as
+SN R = RSS0
+A/H
+− (N + NF + LI) (10)
+where N = 10 log10(kBT) with Boltzmann constant k is
+the thermal noise for assumed temperature T = 290 K.
+The estimated data rate ranges from Tmin = 263 Mbps for
+SN Rmin = −4.5 dB to Tmax = 4 Gbps for SN Rmax = 20 dB.
+We note that this post-processing step does not compromise
+the validity of our measured data since the sensitivity S
+0
+is still
+sufficiently low to ensure detection of all signals that result in
+a data rate greater than zero, i.e.
+SN R(RSS = S
+0
+) = −5.61 dB < SN Rmin. (11)
+The estimated data rate T obtained after this post-processing
+operation is presented in Sec. IV-B.
+IV. MEASUREMENT RESULTS & ANALYSIS
+In this section, we present the results of the measurement
+campaign outlined in Sec. III. In Sec. IV-A, we analyze
+available link opportunities in terms of the observed multipath
+clusters based on measured RSS, and we trace the corresponding independent physical propagation paths between TX and
+RX. In Sec. IV-B, we analyze the effects of beam misalignment
+on the estimated achievable mm-wave data rate.
+A. Link Opportunities & AoA Analysis
+In the following, we study significant link opportunities
+that were found during our measurement campaign, trace the
+corresponding physical propagation paths on an environment
+map and analyze the observed differences between the phased
+antenna array and horn antenna measurement data. To that
+end, we present our results as follows. Figs. 7-8 present
+the RSS versus RX orientations in a heatmap which allows
+us to investigate the structure of received multipath clusters.
+Here we assume for each RX orientation (φRX, θRX) the best
+corresponding transmitter orientation φT X found during the
+measurements, in order to show the full set of multipath
+clusters available at each receiver location. Fig. 9 illustrates
+the same underlying data as in Figs. 7-8 in terms of the AoA
+1We point out that, even though we give SN Rmin and SN Rma x in dBscale for better comprehensibility, the formula to convert to data rate in (9)
+requires SNR in linear units
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+H (dBm)
+(a) 1Ah measurement: TX1, RX location A, horn antenna.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+H (dBm)
+(b) 1Bh measurement: TX1, RX location B, horn antenna.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+H (dBm)
+(c) 1Ch measurement: TX1, RX location C, horn antenna.
+Fig. 7: RSS versus RX orientation for horn antenna
+measurements at different TX-RX locations (assuming
+optimal TX orientation).
+and how it is related to the environment, showing polar plots
+of the RSS in a schematic environment map of the study area.
+Finally, we present Fig. 10 where we trace the corresponding
+independent physical propagation paths between TX and RX
+based on the AoA, AoD, and potential reflectors in the study
+area. In the following, our results are presented based on
+Figs. 7-10 location-by-location.
+We start our analysis with a typical scenario for a mm-wave
+small cell with a clear LOS, i.e. at RX location A. As expected,
+a strong LOS cluster is observed for both the horn antenna and
+the phased antenna array measurement setup in the heatmaps
+in Fig. 7a and Fig. 8a, respectively. Nonetheless, we observe
+the distinct effect of the different antenna patterns on the RSS
+measured with respect to the RX steering angle. While the
+horn antenna measurement in Fig. 7a exhibits a smooth cluster,
+the same cluster appears irregular for the phased antenna array
+measurement shown in Fig. 8a2
+. Similarly, the AoA polar plot
+for scenario 1A in Fig. 9a allows us to clearly recognize the
+impact of the horn antenna and phased antenna array radiation
+patterns (cf. Fig. 3b– 3c). The consequence of this is that
+the non-ideal, phased antenna array radiation pattern makes it
+much more difficult to identify true independent propagation
+paths. For instance, let us consider in Fig. 9a the AoA polar
+plot, which exhibits several peaks for the phased antenna array
+RSS. The first peak around φRX = 0
+◦ points in the LOS
+direction. Additionally, we observe peaks around φRX = −30◦
+,
+2
+In Fig. 8, we note that the measurement points are not spaced equidistantly
+over azimuth angles φRX . This is due to the imperfect beam steering with
+the manufacturer-supplied beambook, i.e. we observed an offset between the
+beam steering angle that we set and the actual angle of the main lobe seen at
+the over-the-air interface. We measured the offset for all beamsteering angles
+and correct for these offsets during the post-processing of the results.
+8
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+A (dBm)
+(a) 1Aa measurement: TX1, RX location A, phased antenna array.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+A (dBm)
+(b) 1Ba measurement: TX1, RX location B, phased antenna array.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+A (dBm)
+(c) 1Ca measurement: TX1, RX location C, phased antenna array.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+A (dBm)
+(d) 2Ba measurement: TX2, RX location B, phased antenna array.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+−90
+−80
+−70
+RSS
+A (dBm)
+(e) 2Da measurement: TX2, RX location D, phased antenna array.
+Fig. 8: RSS versus RX orientation for phased antenna array
+measurements at different TX-RX locations (assuming
+optimal TX orientation).
+φRX = 30◦
+, φRX = −84◦
+, and φRX = 127◦
+. Taking into
+account AoD information (not shown for brevity), we can
+identify that the high RSSs at φRX = −84◦
+and φRX = 127◦
+correspond to independent secondary NLOS paths, which are
+shown in the environment map in Fig. 10a. By contrast, the
+high RSSs around φRX = −30◦
+and φRX = 30◦
+are due to
+sidelobes that point into the LOS direction, thereby falsely
+indicating independent propagation paths. This is clear when
+looking at the map in Fig. 9a, as there are no reflectors at
+φRX = −30◦
+and φRX = 30◦
+from the RX. However, this
+may cause problems to beamsteering algorithms that do not
+have information about the environment and the AoD. For
+instance, an algorithm may generate a list of orientations
+supposedly corresponding to viable independent propagation
+paths during initial beam training. Then in the case of detected
+blockage on the primary path, it may switch to a falsely
+indicated propagation path, i.e. it switches to a sidelobe over
+the same path. Consequently, it would fail to overcome the
+link blockage.
+We next consider RX location B. Again we start our analysis
+by comparing the heatmap of the horn antenna measurement
+in Fig. 7b with the heatmap of the phased antenna array
+measurement in Fig. 8b. In line with the observations for
+RX location A, we note the significant differences between
+the cluster appearance for horn antenna and phased antenna
+array measurements. However, in contrast to the results at RX
+location A, two almost equally strong multipath clusters are
+observed for RX location B. Fig. 9b shows the AoA polar plot
+for the measurement scenario 1B. Combining knowledge of the
+AoA, the environment, and the steered phased antenna array
+radiation pattern, we can trace the two physical propagation
+paths as shown in Fig. 10a, where the NLOS path likely
+included the reflection from a shop window. Nonetheless, we
+observe again that tracing the physical propagation paths is
+difficult purely based on AoA information (cf. Fig. 9b), as
+previously described for receiver location A. In contrast to
+the measurement 1Aa, we point out that AoD information
+is not helpful in measurement scenario 1Ba to distinguish
+between a true independent propagation path and a sidelobeinduced high RSS. The reason is that the AoD is the same
+for both the LOS and NLOS path (cf. Fig. 10a) with our
+AoD measurement resolution of around 6
+◦
+. Overall, we can
+draw two conclusions based on these observations. On the one
+hand, the observation of having multiple link opportunities is
+promising for mm-wave system designers as it suggests that
+mm-wave coverage can also be provided for urban scenarios
+with a partly blocked LOS. On the other hand, our results
+suggest that even knowing both AoA and AoD may not be
+sufficient to reliably identify true independent propagation
+paths. Instead, we used both a priori environment information
+and knowledge of the real steered phased antenna array radiation pattern to identify such independent propagation paths. In
+practice, future commmercial mobile mm-wave systems will
+not have such perfect, a priori information. Consequently,
+other strategies will be needed to identify true independent
+propagation paths. For instance, in scenarios with high link
+budget, using a nearly omni-directional radiation pattern at the
+receiver to record the power delay profile may allow extracting
+the number of independent propagation paths based on time
+of arrival [7]. Alternatively, environment-awareness will be
+essential for robust mm-wave beamsteering.
+Let us now consider RX location C to investigate a LOS
+scenario that is similar to that of RX location A. The
+differences are an increased TX–RX distance and the fact
+that RX C is positioned in an 18 m wide street canyon
+with buildings to either side. Nonetheless, the heatmap of
+the horn antenna measurement in Fig. 7c and the phased
+antenna array measurement in Fig. 8c strongly resemble the
+heatmaps obtained for RX location A (cf. Fig. 7a and Fig. 8a,
+respectively). We combine the knowledge of the AoA shown in
+Fig. 9c, AoD (not shown here for brevity) and the knowledge
+of the environment to trace the independent NLOS paths for
+RX location C. These are shown in the environment map in
+Fig. 10a. However, we emphasize that these are difficult to
+trace solely based on the AoA polar plot in Fig. 9c due to the
+9
+0°
+127°
+-84°
+TX 1
+RX A
+Pharmacy
+(a) 1A measurement.
+Shop
+""fielmann""
+0°
+-132°
+RX B
+TX 1
+(b) 1B measurement.
+0°
+RX C
+TX 1
+(c) 1C measurement.
+Shop
+""fielmann""
+0°
+-71°
+RX B
+TX 2
+115°
+(d) 2B measurement.
+0°
+-30°
+TX 2
+RX D
+60°
+(e) 2D measurement.
+Concrete object/wall
+Metal/window
+Lamppost/metal obj.
+RSS, horn antenna, TX1
+RSS, phased array, TX1
+Trees
+RSS, phased array, TX2
+(f) Legend.
+Fig. 9: Illustrated RSS over azimuth angles per TX-RX pair. The RSS polar plots are normalized to the maximum RSS per
+RX location to focus on the AoA analysis.
+irregular, phased antenna array radiation pattern. For instance,
+the AoA at RX location C (cf. Fig. 9c) looks similar to the
+AoA at RX location A (cf. Fig. 9a). Yet, at RX location A
+the high RSS at angle φRX = 30◦
+is caused by a sidelobe
+whereas it corresponds to a true independent propagation path
+at RX location C. This underlines the difficulty of identifying
+viable independent physical propagation paths by one-sided
+RSS measurements.
+Let us now investigate measurements that were conducted
+with the TX at location TX 2, i.e. at the corner of the car
+park. First, we consider the RX location B for which we
+already discussed the measurement results from a transmitter
+at location TX 1. Again the LOS is obstructed, this time by
+a lamppost with a flower box mounted on it. The distance
+between TX 2 and RX B was 63 m. Fig. 8d shows the
+heatmap for the TX 2 - RX B pair, where we note several
+multipath clusters, the strongest received around φRX = −71◦
+.
+Fig. 9d shows the corresponding AoA polar plot, where
+we can see the peaks around φRX = −71◦
+, φRX = 115◦
+,
+and φRX = 0
+◦
+. All three orientations correspond to true
+independent signal propagation paths as shown in the environment map in Fig. 10b. The signal was likely reflected
+at several shop windows. The independent propagation paths
+were traced and distinguished from sidelobe-induced high RSS
+using information about the environment and the steered RX
+phased antenna array radiation pattern (not shown here for
+brevity). The latter does not have sidelobes that could have
+caused a high RSS at these RX orientations. We emphasize that
+AoD information cannot help to distinguish true independent
+propagation paths from sidelobes, as previously described for
+measurement 1Ba. Overall, these results support the previous
+observations that multiple mm-wave link opportunities can
+be found even in distant and NLOS scenarios in the given
+urban environment, but identifying independent propagation
+paths requires combined knowledge from different sources, i.e.
+environmental awareness, beyond pure RSS measurements.
+Finally, we evaluate the measurement results from RX
+location D where the LOS path from the transmitter in location
+TX 2 was obstructed by the foliage of a tree. Nevertheless, the
+heatmap in Fig. 8e shows higher RSS values at φRX = 0
+◦
+, i.e.
+in the direction of the transmitter, than for other orientations.
+The path loss for the LOS path is 8 dB higher than free
+space path loss, likely due to the foliage. In addition to the
+LOS path, we can identify NLOS paths based on the AoA
+polar plot in Fig. 9e, AoD (not shown here for brevity), and
+knowledge of the environment. Metal columns in front of a
+building and a lamppost likely reflected the signals as shown
+in the environment map in Fig. 10b.
+Overall, our measurements show 2–4 multipath clusters per
+receiver position. Reflections were mainly caused by metal or
+10
+RX C RX B
+RX A
+TX 1
+Concrete object/wall
+Metal/window
+Lamp-/metal post
+LOS path
+NLOS path
+Transmitter position
+Receiver position
+Trees
+(a) Signal paths from transmitter 1.
+RX B
+RX A
+RX D
+TX 1
+TX 2
+(b) Signal paths from transmitter 2.
+Fig. 10: Maps showing the LOS/NLOS path traces from the
+different TX and RX positions. The materials of buildings
+and other objects are also indicated.
+glass on facades and, somewhat surprisingly, by lampposts,
+enabling potential NLOS links in multiple scenarios. We
+observed significant differences between the measurements
+with the phased antenna arrays as compared to measurements
+with the horn antenna. In particular, we noted that determining independent propagation paths purely based on onesided phased antenna array RSS measurements was not a
+reliable approach. Instead, knowledge of both AoA and AoD,
+and of the actual environment, was needed to identify such
+independent propagation paths. Additionally, due to smallscale movements of a user or non-ideal beam training, the
+transmitter and the receiver may not be perfectly aligned. In
+Sec. IV-B we therefore present an analysis of the effects of
+beam misalignment at transmitter and receiver on achievable
+data rates of the mm-wave link opportunities revealed by our
+measurements.
+B. Analysis of Beam Misalignment Effects
+In this section we study the effect of beam misalignment
+on the link performance in outdoor mm-wave networks, using
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+1
+2
+3
+4
+T (Gbps)
+(a) Scenario 1Ah: TX1, RX location A, horn antenna.
+−100 0 100
+−20
+0
+20
+40
+60
+Azimuth φR x (
+◦
+)
+Elevation θR x (
+◦
+)
+1
+2
+3
+4
+T (Gbps)
+(b) Scenario 1Aa: TX1, RX location A, phased antenna array.
+Fig. 11: Estimated data rate versus RX orientation for
+scenario 1A (assuming optimal TX orientation).
+the estimated achievable data rate as calculated from (9) as
+the performance metric. We emphasize that considering the
+achievable data rate rather than solely RSS measurements
+(as in Sec. IV-A) allows us to better understand and assess
+the networking consequences of misaligned beams, especially
+with regard to higher system layers that need to cope with
+the resulting changes in the achievable PHY data rate. To
+illustrate this, in Fig. 11 we show the heatmap of estimated
+data rate versus RX orientation for RX location A (cf. Fig. 7a
+and Fig. 8a for the corresponding RSS versus RX orientation
+heatmaps). From the heatmap in Fig. 11b, it is evident that a
+phased antenna array beam misalignment of a few degrees in
+the azimuth can result in a dramatic loss in data rate.
+In real mm-wave outdoor deployments such beam misalignments can occur for several reasons. Fig. 12 illustrates several
+typical scenarios, where we consider the BS to be the transmitter and the UE to be the receiver, i.e. the downlink. After
+successful initial beam training, the BS and UE are ideally
+perfectly aligned. However, imperfect beam training due to
+e.g. stale beam training data or ambiguous information about
+independent propagation paths (as described in Sec. IV-A)
+may result in beam misalignments. Such beam misalignments
+can occur at the BS and at the UE as shown in Fig. 12a.
+Additionally, a UE beam misalignment may be caused by a
+rotation of the device, as illustrated in Fig. 12b. Fig. 12c shows
+how a small-scale lateral movement of the UE out of the BS’s
+beam causes a beam misalignment at both BS and UE. The UE
+may then readjust its beam orientation to try and mitigate the
+effects of the BS beam misalignment, as illustrated in Fig. 12d.
+In the following, we analyze how these beam misalignment
+scenarios affect the estimated achievable data rate based on
+our measured RSS data. We note that even though we focus
+our analysis on the downlink scenario, the general causes for
+beam misalignment as shown in Fig. 12 are the same for the
+uplink case.
+1) BS Beam Misalignment Analysis: After initial beam
+training, mobile users in a mm-wave network can cause a BS
+beam misalignment for example by physically moving out of
+the BS’s beam (cf. Fig. 12c). Similarly, imperfect beam train-
+11
+UE
+BS
+(a) BS and/or UE beam
+misaligned due to imperfect
+beam training.
+UE
+BS
+(b) UE beam misaligned after
+rotation.
+UE
+dmove
+BS
+(c) BS and UE beams
+misaligned after small-scale
+lateral movement dmove of
+UE.
+UE dmove
+BS
+(d) BS beam misaligned after
+small-scale lateral movement of
+UE; UE locally adjusted its
+beam to new optimal
+orientation.
+Fig. 12: Scenarios illustrating potential beam misalignments
+at BS and UE.
+ing may result in a BS beam misalignment (cf. Fig. 12a). In
+this section, we study the residual loss in estimated achievable
+data rate for such BS beam misalignments, assuming that the
+UE locally adjusts its orientation dynamically to mitigate the
+BS beam misalignment effects (cf. Figs. 12a and 12d). Namely,
+we consider
+T(∆T X) = max
+φRX,θRX
+T(∆T X, φRX, θRX), (12)
+where ∆T X is the beam misalignment with respect to the best
+possible BS orientation φT X,best, i.e.
+∆T X = φT X − φT X,best, (13)
+φT X,best = arg max T(φT X, φRX, θRX). (14)
+We neglect the elevation misalignment based on the assumption that all UEs are in the same plane, such that the BS’s
+elevation beam misalignment is negligible as compared to the
+BS’s elevation HPBW of 36◦
+. We note that the best possible
+BS orientation corresponds to LOS links for the scenarios 1A,
+1C, and 2D, and to NLOS links for the scenarios 1B and 2B.
+In Fig. 13 we show the estimated achievable data rate T
+of a link over the BS (TX) beam misalignment ∆T X with
+respect to the best possible BS orientation φT X,best. Based
+on Figs. 13a–13b we make three observations about beam
+misalignment for our phased antenna array setup. First, we
+observe that the maximum data rate is only achieved without
+beam misalignment, i.e. there is only one maximum peak.
+Second, small beam misalignments in the order of the HPBW
+cause significant losses in data rate of up to 70%. For instance,
+a beam misalignment of −7
+◦
+in scenario 1A produces a drop
+from 4 Gbps to 1.4 Gbps and from 2.6 Gbps to 0.8 Gbps
+in scenario 2D. Third, the loss in data rate is not increasing
+monotonically with increasing beam misalignment. Overall,
+−80 −60 −40 −20 0 20 40 60 80
+0
+1
+2
+3
+4
+TX antenna beam misalignment ∆T X (
+◦
+)
+T (Gbps)
+1A 1B 1C
+(a) Phased antenna array results for TX1.
+−80 −60 −40 −20 0 20 40 60 80
+0
+1
+2
+3
+4
+TX antenna beam misalignment ∆T X (
+◦
+)
+T (Gbps)
+2B 2D
+(b) Phased antenna array results for TX2.
+−80 −60 −40 −20 0 20 40 60 80
+0
+1
+2
+3
+4
+TX antenna beam misalignment ∆T X (
+◦
+)
+T (Gbps)
+1A 1B 1C
+(c) Horn antenna results.
+Fig. 13: The estimated data rate T versus the BS (TX) beam
+misalignment ∆T X with respect to the best possible link
+(assuming optimal φRX, θRX).
+the results in Figs. 13a–13b demonstrate that a UE locally
+adjusting its orientation is not sufficient to fully mitigate the
+effects of BS beam misalignment. Consequently, strategies for
+tracking UE movement at the BS are required to maintain
+high data rates. Moreover, given the observed non-monotonic
+relationship between beam misalignment and loss in data rate,
+we expect that some types of beam tracking algorithms will not
+work reliably. For instance, let us consider an RSS-gradientfollowing beam tracking approach, i.e. an algorithm that tries
+to find the ideal beam orientation by adapting the beam
+orientation of its phased antenna array beam to a neighboring
+orientation that achieves a higher RSS. Due to the observed
+irregular variation of the achievable data rate over increasing
+beam misalignment, it would not be able to find the global
+optimal orientation.
+In Fig. 13c, we present the estimated maximum data rate
+over the horn antenna BS beam misalignment for comparison
+with the phased antenna array results. We observe that the data
+rates decrease monotonically with increasing misalignment
+which is in contrast to the observations made in Figs. 13a–13b
+for the phased antenna array. We emphasize that this stark
+dissimilarity between the results for the antenna types indicates
+12
+0 50 100 150
+−100
+−80
+−60
+−40
+−20
+0
+RX antenna beam misalignment ∆RX (
+◦
+)
+Loss in
+T (%)
+Array
+Horn
+(a) Measurement 1A.
+0 50 100 150
+−100
+−80
+−60
+−40
+−20
+0
+RX antenna beam misalignment ∆RX (
+◦
+)
+Loss in
+T (%)
+Array
+Horn
+(b) Measurement 1B.
+0 50 100 150
+−100
+−80
+−60
+−40
+−20
+0
+RX antenna beam misalignment ∆RX (
+◦
+)
+Loss in
+T (%)
+Array
+Horn
+(c) Measurement 1C.
+0 50 100 150
+−100
+−80
+−60
+−40
+−20
+0
+RX antenna beam misalignment ∆RX (
+◦
+)
+Loss in
+T (%)
+Array
+(d) Measurement 2B.
+0 50 100 150
+−100
+−80
+−60
+−40
+−20
+0
+RX antenna beam misalignment ∆RX (
+◦
+)
+Loss in
+T (%)
+Array
+(e) Measurement 2D.
+Fig. 14: Loss in estimated data rate T versus UE (RX) beam
+misalignment ∆RX with respect to the best possible link
+(assuming optimal φT X).
+that we cannot simply infer the impact of beam misalignments
+on mm-wave links based on measurements taken with horn
+antennas as in e.g. [6], [12] or calculations based on simplistic
+directional antenna radiation pattern models as in e.g. [23].
+Instead, realistic phased antenna array radiation patterns have
+to be explicitly taken into account in the design of beam
+training and tracking algorithms.
+2) UE Beam Misalignment Analysis: In Figs. 12b–12c we
+illustrated how a rotation or small-scale movement of the UE
+may result in a UE beam misalignment. Similarly, imperfect
+beam training as shown in Fig. 12a may lead to a UE beam
+misalignment. In this section, we study the effects of such UE
+beam misalignments, assuming that the BS locally adjusts its
+orientation dynamically to mitigate the UE beam misalignment
+effects. We thus apply the same principle of considering onesided misalignment only, as in the previous analysis of the BS
+-30 0 30 60
+0
+1
+2
+3
+4
+RX elevation angle θRX (
+◦
+)
+T (Gbps)
+1A
+1B
+1C
+2B
+2D
+Fig. 15: Boxplots of the estimated data rate T that can be
+achieved with the phased antenna array over all UE azimuth
+angles φRX with a fixed UE elevation angle θRX
+(assuming optimal φT X).
+beam misalignment. Namely, we consider
+T(∆RX) = max
+φT X
+T(φT X, ∆RX). (15)
+where ∆RX is the beam misalignment with respect to the best
+possible UE orientation (φRX,best, θRX,best) comprising both
+the azimuth and elevation misalignment, i.e.
+∆RX =
+q
+(φRX − φRX,best)
+2 + (θRX − θRX,best)
+2
+, (16)
+(φRX,best, θRX,best) = arg max T(φT X, φRX, θRX). (17)
+In Fig. 14 we present the loss in estimated data rate T for
+a UE (RX) antenna beam misalignment ∆RX with respect to
+the best possible UE orientation. Figs. 14a–14c show results
+for both measurement setups, where we again observe that
+a misalignment causes a gradual loss in data rate for the
+horn antenna results, whereas the phased antenna array results
+vary rather irregularly. This confirms that we cannot simply
+infer the impact of beam misalignments on mm-wave links
+based on measurements taken with horn antennas. Moreover,
+in Figs. 14a–14e we find that a small misalignment of the UE
+phased antenna array beam of up to 8◦
+results in losses of
+data rate between 6–60%. This demonstrates that even with
+perfect UE tracking, agile beamsteering at the UE is needed
+to compensate residual losses in data rate due to misalignment.
+One key to enabling mm-wave networks is to successfully
+integrate UE phased antenna arrays that can reliably maintain a
+connection over all 3D orientations. As described in Sec. III-A,
+the phased antenna array used in our measurements only
+allows azimuth beamsteering while having a wide elevation
+HPBW of 36◦
+. To investigate if this is a suitable configuration
+for a mm-wave UE, we isolate the effect of the UE elevation
+angle on estimated data rates. We expect that the best data rate
+would be achieved for the measured elevation angles θRX that
+are closest to the ideal elevation orientation towards the BS,
+which can be computed from the distances between BS and UE
+(cf. Table I). Namely, we expect the scenarios 1A and 2D to
+achieve approximately equal maximum estimated achievable
+data rate for θRX = 0
+◦
+and θRX = 30◦
+, as the distances
+between BS and UE was the shortest in these cases, implying
+a greater elevation angle. For larger distances between BS and
+UE, the ideal elevation angle is smaller and we expect to see
+the maximum estimated achievable data rate for the scenarios
+1B, 1C, and 2B at θRX = 0
+◦
+.
+13
+Fig. 15 shows boxplots of the estimated data rate T over all
+azimuth angles φRX ∈ [−180◦
+, 180◦
+] for UE elevation angle
+θRX, i.e. we consider
+T(θRX) = max
+φT X
+T(φT X, φRX, θRX). (18)
+We observe a drop in maximum estimated data rate for all
+results except 1A when the elevation angle is not equal to 0◦
+.
+This is expected, except for the result 2D which shows an
+outlier achieving around 2.6 Gbps for θRX = 0
+◦
+. This may be
+due to the tree foliage that blocked the LOS between TX and
+RX (cf. Fig. 2i). Overall, despite the large HPBW of the phased
+antenna array pattern in the elevation plane of 36◦
+, the loss in
+the maximum achievable estimated data rate ranges between
+26% and 70% for a change in elevation angle θRX from 0◦
+to 60◦ over all results presented in Fig. 15. Therefore, we
+conclude that 2D beamsteering will not be sufficient to fully
+exploit available UE link opportunities in a 3D environment.
+3) Two-sided Beam Misalignment Analysis: In the previous
+sections, we treated the effects of BS and UE beam misalignment separately. However, in real outdoor mm-wave network
+deployments, a misalignment at both BS and UE is likely to
+occur simultaneously (cf. Fig. 12). We now study this case
+for the phased antenna array results, i.e. the beamsteering
+opportunities at the UE for a given BS beam misalignment.
+To this end, in Figs. 16-17 we show the estimated data rate T
+over UE (RX) azimuth angles φRX for selected measurement
+scenarios and for selected representative BS (TX) orientations
+φT X. In Figs. 16-17 we only consider the UE elevation angle
+θRX = 0
+◦
+, which was observed to achieve the highest data
+rates over all elevation angles (cf. Fig. 15).
+In Fig. 16 the BS orientations φT X were selected to study the
+effects of small-scale misalignment in the order of the HPBW
+of around 6
+◦
+. From Fig. 16 it is evident that the UE achieves
+the highest estimated data rate and has the maximum number
+of viable orientations when the transmitter is well aligned, i.e.
+φT X = 0
+◦ or φT X = ±3
+◦
+. A small-scale misalignment of the
+transmitter of ±7
+◦
+to ±10◦ produces a significant decrease
+in the maximum estimated data rate of up to 54%. For a
+misalignment in the order of ±7
+◦
+at both BS and UE, the
+loss in estimated data rate is 38%–100% with a median of
+70% across all our results. Overall, we conclude that the
+joint effect of small-scale beam misalignment at BS and UE
+results in severe losses in data rate, placing the burden on agile
+beamtracking algorithms to update BS and UE orientation at
+a sufficient rate to ensure robustness of high data rate links
+for mobile users.
+In Fig. 17 the BS orientations φT X were selected to study
+link opportunities that occur due to sidelobes or independent
+secondary propagation paths, i.e. at orientations that deviate
+at large-scale from the best orientation. In Fig. 17a, for
+φT X = 30◦
+the overall estimated data rates are below those
+for φT X = 0
+◦
+, but the shape of the curve is similar. This
+suggests that the transmitter has a sidelobe towards the receiver
+when oriented at φT X = 30◦
+, using the same propagation path
+as for φT X = 0
+◦
+. By contrast, we observe an independent
+secondary (NLOS) propagation path for φRX = −84◦
+and
+φT X = 41◦ which was also traced on the environment map
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+−7
+◦
+0
+◦
+7
+◦
+(a) Measurement 1A.
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+−7
+◦
+0
+◦
+7
+◦
+(b) Measurement 1B.
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+−10◦
+−3
+◦
+3
+◦
+10◦
+(c) Measurement 2B.
+Fig. 16: Estimated data rate T versus RX azimuth angles
+φRX for selected measurements and selected fixed BS
+orientations φT X, representative of small-scale BS beam
+misalignment (θRX = 0
+◦
+assumed throughout).
+of the study area (cf. Fig. 10a). Fig. 17b reveals the same
+trend. The φRX-dependent link opportunities for φT X = −37◦
+are similar to those for φT X = 3
+◦
+, suggesting that they
+resulted from a sidelobe of the transmitter. For φT X = −29◦
+,
+a distinct signal path with a receiver orientation of φRX = 35◦
+yields the highest estimated data rate (cf. Fig. 10a for the
+map of the study area). Finally, in Fig. 17c two independent
+secondary propagation paths for φT X = −33◦
+and φT X = 17◦
+are observed. Based on the results in Fig. 17, we conclude
+that identifying an independent secondary propagation path
+between BS and UE solely based on measured data rates or
+signal quality over either AoD or AoA data is very difficult,
+as sidelobes may also allow good data rates using the primary
+signal path. An approach of combining information from BS,
+UE, and external sources such as motion sensors or other
+environmental awareness, e.g. [35], [36], may therefore be
+needed to identify independent secondary propagation paths
+that can be used to overcome blockage which may occur on
+the primary path.
+V. DISCUSSION
+Our mm-wave measurements in a German town center
+showed a limited number of 2–4 multipath clusters per receiver
+position, which is similar to the results reported for dense
+urban areas in modern metropolises [3]–[6]. This stands in
+contrast to expectations that the differences in building types
+14
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+0
+◦
+30◦
+41◦
+(a) Measurement 1A.
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+−37◦
+−29◦
+3
+◦
+(b) Measurement 1C.
+−100 0 100
+0
+1
+2
+3
+4
+RX azimuth angle φRX (
+◦
+)
+T (Gbps)
+φTX
+−33◦
+0
+◦
+17◦
+(c) Measurement 2D.
+Fig. 17: Estimated data rate T versus RX azimuth angles
+φRX for selected measurements and selected fixed BS
+orientations φT X, representative of large-scale BS beam
+misalignment (θRX = 0
+◦
+assumed throughout).
+and layout between a typical European town and dense urban
+areas in modern metropolises would have an effect on the
+number of mm-wave multipath clusters. Our results thus
+suggest that it is possible to cover such small cities with
+mm-wave Gbps-networks at limited infrastructure cost, as the
+area of such city centers is rather small and suitable base
+station sites are, thanks to the building structure, easier to
+find than in more metropolitan areas. This suggests that mmwave phased antenna arrays and mm-wave massive MIMOtype deployments are an attractive approach to achieve Gbps
+data rates in such environments.
+However, looking more closely at the structure of the
+received multipath clusters, we observe the paradigm shift
+that occurs when moving from horn antennas to real phased
+antenna arrays. The clusters exhibit a smooth structure when
+measured with the horn antenna which has a radiation pattern
+without strong sidelobes or nulls, thereby giving a good indication of the actual underlying physical propagation paths. The
+same physical propagation paths are perceived very differently
+with the phased antenna array: the clusters appear irregular.
+This is a consequence of the real phased antenna array which
+has a non-ideal radiation pattern with significant sidelobes and
+nulls, as shown in Figs. 3c–3d. We also note that such strong
+sidelobes in the radiation pattern may result in significant intracell interference, which will have to be carefully considered
+during mm-wave network system design. Yet, this fact has
+been given only very little attention in the existing literature.
+As observed throughout this paper, the antenna radiation
+pattern plays a similarly crucial role in the effects of mm-wave
+beam misalignment. Our measurements with horn antennas
+show a monotonic relationship between misalignment and
+loss in received power, as also presented in earlier studies
+[6], [12]. By contrast, this does not hold for our phased
+antenna array results. For azimuth beam misalignments larger
+than the HPBW the degradation of estimated data rate is not
+monotonic with increasing beam misalignment for the nonideal, phased antenna array radiation pattern. Instead, it varies
+irregularly with increasing beam misalignment. Consequently,
+measurement results obtained with horn antennas cannot simply be generalized to also hold for phased antenna arrays when
+investigating the effect of beam misalignment on the expected
+performance of real mm-wave networks. Similar implications
+hold for the theoretical works that make use of simplistic
+idealized antenna patterns, e.g. [22], [23].
+Our results also showed that a small-scale beam misalignment at one station, i.e. either at BS or UE, caused a significant
+loss in estimated data rate that cannot be mitigated fully by
+the other station. We expect such a one-sided misalignment
+to be particularly harmful in uplink situations. As mm-wave
+UEs will likely not be able to feature phased antenna arrays of
+the same size as BSs, their antenna gain will be more limited
+due to the smaller number of antenna elements. Moreover,
+due to the limited battery capacity of the UE, also its output
+power will be more limited than the BS’s output power. While
+the link performance could still be acceptable under beam
+misalignment when the BS transmits with high EIRP, this may
+not be the case under beam misalignments in uplink scenarios,
+where the UE EIRP is likely to be significantly lower. Thus, we
+expect to see a large asymmetry between uplink and downlink
+performance in mm-wave networks. Overall, we conclude that
+both the BS and UE in mm-wave networks will need to
+frequently adjust their orientation to counteract even one-sided
+small-scale beam misalignments.
+Furthermore, we note that one of the key challenges for enabling mm-wave outdoor networks is the handling of dynamic
+blockages by using an independent secondary unblocked signal path, as e.g. pedestrian blockage typically only concerns
+one multipath cluster and other multipath clusters remain
+unaffected [7]. However, due to the strength of sidelobes
+in non-ideal, phased antenna array radiation patterns, our
+results suggest that it may be difficult to distinguish between
+a true independent secondary propagation path and a link
+opportunity due to a sidelobe. This distinction is crucial, as
+link opportunities due to sidelobes on the primary propagation
+path are also affected by blockage of the primary propagation
+path. Beamsteering algorithms that obtain a list of viable
+link opportunities based on a simple RSSI search, e.g. IEEE
+802.11ad-like algorithms [37], are thus expected to suffer from
+this ambiguity if they do not restart at least a partial beam
+search upon link blockage.
+Finally, our analysis suggest that, despite the wide elevation
+HPBW of our phased antenna array of 36◦
+, 2D beamsteering
+is not sufficient to fully exploit available link opportunities at
+certain receiver positions. These results agree with the findings
+in [38] where it was demonstrated that 3D rotations can result
+15
+in strong link degradations. This is particularly relevant as
+many beamsteering algorithms proposed in the literature only
+consider the planar case [38]. We expect that 3D beamsteering
+and hand-grip aware beamcombining [39] will be required to
+maintain a high data rate under rotation of the user device
+and different user activities. Despite the already increasing
+complexity of 5G-and-beyond protocol design, even additional
+external information, location-based environmental awareness,
+shared beamsteering information from devices in direct vicinity of a UE, or local data from a motion tracking sensor may
+further enhance the robustness and seamless coverage of mmwave deployments under user mobility.
+VI. CONCLUSIONS
+We presented the results of the first comprehensive largescale outdoor mm-wave measurement study using a stateof-the-art phased antenna array in a European town. The
+data obtained over more than 5,000 systematic fine-grained
+AoA/AoD combinations per TX/RX pair was analyzed with
+respect to the number of available link opportunities and the
+effect of beam misalignment at the receiver and transmitter
+on the estimated mm-wave link data rate, and compared to
+reference measurements taken with a horn antenna. Our results
+show a limited number of 2–4 available multipath clusters
+per receiver location, indicating that the mm-wave multipath
+richness in a European town is surprisingly similar to that in
+dense urban metropolises as presented in prior literature. The
+results for the phased antenna array reveal that losses in the
+estimated data rate of up to 70% occurred for small beam
+misalignments in the order of the HPBW, with significant
+and irregular variations in the estimated data rate for larger
+beam misalignments, caused by the non-ideal, phased antenna
+array radiation pattern. This stands in stark contrast to the horn
+antenna reference measurements, where the loss in estimated
+data rate was observed to be monotonically increasing with
+the misalignment error. Moreover, our results suggest that the
+characteristics of non-ideal, phased antenna array radiation
+patterns should be explicitly considered during the design and
+testing of mm-wave beamsteering algorithms. To this end, our
+ongoing work is focused on conducting further measurements
+in more diverse urban scenarios, explicitly studying the performance of beamsteering and beamtracking algorithms based
+on data obtained with real mm-wave phased antenna arrays.
+REFERENCES
+[1] T. S. Rappaport, S. Sun, R. Mayzus, H. Zhao, Y. Azar, K. Wang, G. N.
+Wong, J. K. Schulz, M. Samimi, and F. Gutierrez, “Millimeter wave
+mobile communications for 5G cellular: It will work!” IEEE Access,
+2013.
+[2] M. Xiao, S. Mumtaz, Y. Huang, L. Dai, Y. Li, M. Matthaiou, G. K.
+Karagiannidis, E. Björnson, K. Yang, C. I, and A. Ghosh, “Millimeter
+wave communications for future mobile networks,” IEEE J. Sel. Areas
+Commun., vol. 35, no. 9, pp. 1909–1935, Sep. 2017.
+[3] T. S. Rappaport, G. R. MacCartney, M. K. Samimi, and S. Sun, “Wideband millimeter-wave propagation measurements and channel models for
+future wireless communication system design,” IEEE Trans. Commun.,
+vol. 63, no. 9, pp. 3029–3056, Sep. 2015.
+[4] M. Samimi, K. Wang, Y. Azar, G. N. Wong, R. Mayzus, H. Zhao,
+J. K. Schulz, S. Sun, F. Gutierrez, and T. S. Rappaport, “28 GHz
+angle of arrival and angle of departure analysis for outdoor cellular
+communications using steerable beam antennas in New York City,” in
+Proc. IEEE VTC, Jun. 2013.
+[5] S. Hur, Y. J. Cho, T. Kim, J. Park, A. F. Molisch, K. Haneda,
+and M. Peter, “Wideband spatial channel model in an urban cellular
+environments at 28 GHz,” in Proc. IEEE EuCAP, May 2015.
+[6] L. Simic, N. Perpinias, and M. Petrova, “60 GHz outdoor urban ´
+measurement study of the feasibility of multi-Gbps mm-wave cellular
+networks,” in Proc. IEEE INFOCOM Workshops, Apr. 2016.
+[7] R. J. Weiler, M. Peter, W. Keusgen, and M. Wisotzki, “Measuring
+the busy urban 60 GHz outdoor access radio channel,” in Proc. IEEE
+ICUWB, Sep. 2014.
+[8] S. Rajagopal, S. Abu-Surra, and M. Malmirchegini, “Channel feasibility
+for outdoor non-line-of-sight mmwave mobile communication,” in Proc.
+IEEE VTC, Sep. 2012.
+[9] J. Ko, Y. Cho, S. Hur, T. Kim, J. Park, A. F. Molisch, K. Haneda,
+M. Peter, D. Park, and D. Cho, “Millimeter-wave channel measurements
+and analysis for statistical spatial channel model in in-building and urban
+environments at 28 GHz,” IEEE Transactions on Wireless Communications, vol. 16, no. 9, pp. 5853–5868, Sep. 2017.
+[10] T. S. Rappaport, Y. Xing, G. R. MacCartney, A. F. Molisch, E. Mellios,
+and J. Zhang, “Overview of millimeter wave communications for fifthgeneration (5G) wireless networks-with a focus on propagation models,”
+IEEE Trans. Antennas Propag., vol. 65, no. 12, pp. 6213–6230, Dec.
+2017.
+[11] S. Segan. (2019) Here’s the real truth about Verizon’s 5G network. PC
+Mag Digital Group. [Online]. Available: https://www.pcmag.com/news/
+367659/heres-the-real-truth-about-verizons-5g-network
+[12] J. Lee, M.-D. Kim, J.-J. Park, and Y. J. Chong, “Field-measurementbased received power analysis for directional beamforming millimeterwave systems: Effects of beamwidth and beam misalignment,” ETRI
+Journal, vol. 40, no. 1, pp. 26–38, 2018.
+[13] H. Zhao, R. Mayzus, S. Sun, M. Samimi, J. K. Schulz, Y. Azar, K. Wang,
+G. N. Wong, F. Gutierrez, and T. S. Rappaport, “28 GHz millimeter wave
+cellular communication measurements for reflection and penetration loss
+in and around buildings in New York City,” in Proc. IEEE ICC, June
+2013.
+[14] V. Raghavan, L. Akhoondzadeh-Asl, V. Podshivalov, J. Hulten, M. A.
+Tassoudji, O. H. Koymen, A. Sampath, and J. Li, “Statistical blockage
+modeling and robustness of beamforming in millimeter-wave systems,”
+IEEE Trans. Microw. Theory Tech., vol. 67, no. 7, pp. 3010–3024, July
+2019.
+[15] B. Sadhu, A. Paidimarri, M. Ferriss, M. Yeck, X. Gu, and A. ValdesGarcia, “A 128-element dual-polarized software-defined phased array
+radio for mm-wave 5G experimentation,” in Proc. ACM mmNets Workshop, New Delhi, India, 2018.
+[16] I. Aziz, R. Dahlbäck, E. Öjefors, A. Rydberg, and D. Dancila, “High
+Gain Compact 57-66 GHz Antenna Array for Backhaul & Access
+Communications,” in Proc. IEEE EuCAP, Apr. 2018.
+[17] F. Aryanfar, J. Pi, H. Zhou, T. Henige, G. Xu, S. Abu-Surra, D. Psychoudakis, and F. Khan, “Millimeter-wave base station for mobile
+broadband communication,” in Proc. IEEE MTT-S IMS, May 2015.
+[18] V. Raghavan, A. Partyka, A. Sampath, S. Subramanian, O. H. Koymen,
+K. Ravid, J. Cezanne, K. Mukkavilli, and J. Li, “Millimeter-wave MIMO
+prototype: Measurements and experimental results,” IEEE Commun.
+Mag., vol. 56, no. 1, pp. 202–209, Jan 2018.
+[19] W. Roh, J. Y. Seol, J. Park, B. Lee, J. Lee, Y. Kim, J. Cho, K. Cheun, and
+F. Aryanfar, “Millimeter-wave beamforming as an enabling technology
+for 5G cellular communications: Theoretical feasibility and prototype
+results,” IEEE Commun. Mag., vol. 52, no. 2, pp. 106–113, Feb. 2014.
+[20] D. Kurita, D. Kitayama, K. Tateishi, A. Harada, Y. Kishiyama, S. Itoh,
+H. Murai, J. J. Fwu, X. J. Zhuang, K. Stewart, A. Simonsson, and
+P. Ökvist, “Outdoor experiments on 5G radio access using BS and UE
+beamforming in 28-GHz frequency band,” in Proc. IEEE CCNC, Jan.
+2019.
+[21] R. J. Weiler, W. Keusgen, A. Maltsev, T. Kühne, A. Pudeyev, Liang
+Xian, J. Kim, and M. Peter, “Millimeter-wave outdoor access shadowing
+mitigation using beamforming arrays,” in Proc. IEEE EuCAP, April
+2016.
+[22] A. Thornburg and R. W. Heath, “Ergodic capacity in mmWave ad hoc
+network with imperfect beam alignment,” in Proc. IEEE MILCOM, Oct.
+2015.
+[23] J. Wildman, P. H. J. Nardelli, M. Latva-aho, and S. Weber, “On the joint
+impact of beamwidth and orientation error on throughput in directional
+wireless poisson networks,” IEEE Trans. Wireless Commun., vol. 13,
+no. 12, pp. 7072–7085, Dec. 2014.
+[24] SiversIMA, “Product brief: TRX BF/01,” 2018. [Online]. Available: https://www.siversima.com/wp-content/uploads/PB_TRX-BF01_
+v1-02.pdf
+16
+[25] M. K. Samimi and T. S. Rappaport, “3-D millimeter-wave statistical
+channel model for 5G wireless system design,” IEEE Trans. Microw.
+Theory Tech., vol. 64, no. 7, pp. 2207–2225, Jul. 2016.
+[26] Land NRW, “TIM-online 2.0,” NRW, Germany, 2019. [Online].
+Available: https://www.tim-online.nrw.de/tim-online2/
+[27] ITU-R Resolution 238 (WRC-15), “Studies on frequency-related matters
+for International Mobile Telecommunications identification including
+possible additional allocations to the mobile services on a primary basis
+in portion(s) of the frequency range between 24.25 and 86 GHz for
+the future development of International Mobile Telecommunications for
+2020 and beyond.” 2015.
+[28] SiversIMA, “Product brief: EVK06002,” 2018. [Online]. Available: https://www.siversima.com/wp-content/uploads/PB_EVK-06002-
+00_1-02-1.pdf
+[29] ——, “Product brief: FC1005V/00 V-band converter with LO,”
+2017. [Online]. Available: https://www.siversima.com/wp-content/
+uploads/FC1005V00-Data-Sheet.pdf
+[30] Flann Microwave, “Product brief: Standard gain horns series 240,”
+2016. [Online]. Available: https://flann.com/wp-content/uploads/2016/
+01/Series-240.pdf
+[31] “Frequenzplan gemäß §54 TKG über die Aufteilung des Frequenzbereichs von 0 kHz bis 3000 GHz auf die Frequenznutzungen sowie über
+die Festlegungen für diese Frequenznutzungen,” BNetzA, Mar. 2018.
+[32] K. King. (2018, Sep.) Meanwhile, back in the lab, another 5G
+milestone – Verizon and Samsung reach multi-gigabit throughput
+over 5G NR and mmwave spectrum. [Online]. Available:
+https://www.verizon.com/about/news/meanwhile-back-lab-another-5gmilestone--verizon-and-samsung-reach-multi-gigabit-throughput
+[33] “LTE; evolved universal terrestrial radio access (E-UTRA); radio frequency (RF) system scenarios,” ETSI 3GPP, TR 36.942 version 14.0.0
+Release 14, Apr. 2017.
+[34] “Study on new radio access technology: Radio frequency (RF) and coexistence aspects,” ETSI 3GPP, TS 38.101-2 V14.2.0, Sep. 2017.
+[35] J. Arnold, L. Simic, and P. Mähönen, “Experimental feasibility study of ´
+motion sensor-aided mm-wave beam tracking,” in Proc. ACM mmNets
+Workshop, Snowbird, Utah, 2017.
+[36] L. Simic, J. Arnold, M. Petrova, and P. Mähönen, “RadMAC: radar- ´
+enabled link obstruction avoidance for agile mm-wave beamsteering,”
+in Proc. ACM HotWireless, 2016.
+[37] M. K. Haider and E. W. Knightly, “Mobility resilience and overhead
+constrained adaptation in directional 60 GHz WLANs: protocol design
+and system implementation,” in Proc. ACM MobiHoc, Paderborn, Germany, 2016.
+[38] A. Zhou, L. Wu, S. Xu, H. Ma, T. Wei, and X. Zhang, “Following the
+shadow: Agile 3-D beam-steering for 60 GHz wireless networks,” in
+Proc. IEEE INFOCOM, Apr. 2018.
+[39] A. Alammouri, J. Mo, B. L. Ng, J. C. Zhang, and J. G. Andrews, “Hand
+grip impact on 5G mmWave mobile devices,” IEEE Access, vol. 7, pp.
+60 532–60 544, 2019.'"
+2,"'User-oriented challenges that face the development of mental well-being technologies are then
+considered ranging from user engagement during co-design and trials to ethical and privacy concerns.
+KEYWORDS
+Affective computing, Pervasive computing, Artificial intelligence, IoT, Tangible interfaces
+INTRODUCTION
+The capabilities and possibilities for tangible interfaces to have a positive impact on mental wellbeing are expanding rapidly. The increasing emergence of IoT and computationally-powerful devices
+is opening up new opportunities for delivering mental well-being monitoring in a more automated
+and accessible manner.
+The World Health Organisation defines mobile health (mHealth) as “the use of mobile and wireless
+technologies to support the achievement of health objectives” [23]. Tangible interfaces go beyond
+mobile apps as they enable a person to interact with digital information through the physical
+environment. Mental well-being tangible interfaces possess many qualities including the ability to
+diagnose, promote positive mental well-being, collect and monitor well-being data remotely and
+transform well-being.
+Tangible and embodied interaction improves accessibility, reduces stigma and reduces costs due to
+reduced needs for medical assistance; although there are many obstacles to overcome that need to
+address the usability and computational requirements of these systems. Addressing these challenges
+requires a combination of new design methodologies to cater to user needs and novel techniques to
+improve the functionality of these systems.
+BACKGROUND
+Technological solutions to aid mental well-being are rapidly increasing in popularity
+[12][13][2][1][11]. Numerous mental health apps have exceeded 10 million downloads including
+Calm harm and Headspace demonstrating the popularity of these technological solutions. More
+recently advancements in the IoT have led to the development of tangible interfaces for mental wellbeing [21][22]. Tangible interfaces have the potential to have a more significant impact than mobile
+apps as people are more likely to create stronger emotional attachments with physical devices rather
+than digital interfaces [15][17].
+Previous mental well-being tangible interfaces have focused on promoting the communication and
+recording of mental well-being. EmoEcho [22] allowed two trusted partners to transmit their 
+Figure 1: Challenges associated with
+developing tangible Interfaces for mental
+wellbeing.
+emotional well-being through haptic feedback in real-time and subtle stone [4] enabled students to
+privately transmit their emotions to a teacher through colours. Other tangible interfaces such as
+Emoball [6] and mood TUI [20] aimed to simplify the process of self-reporting emotions.
+A range of tangible interfaces has previously been developed to sense mental well-being including
+wearables measuring heart rate variability (HRV) and skin conductance [9]. When the physiological
+sensors were paired with machine learning they could successfully classify stress with an accuracy of
+97.4% after 5 minutes demonstrating the capabilities that could be incorporated into mental wellbeing tangible interfaces.
+It is not only physiological sensors that can be used to sense and promote positive mental well-being.
+Force sensors have been used within a tangible ball that allows for the manipulation of music by
+sensing varying touch and motion patterns [5]. The research concluded that squeeze music could
+successfully be used for music therapy with children as it promoted positive emotions through tactile
+input and music.
+Further devices have been devised to provide interventions; these devices use a variety of feedback
+mechanisms with the aim of improving mental well-being. Research such as Doppel [3] and good
+vibes [14] show tangible interfaces containing real-time interventional feedback can have positive
+impacts on mental well-being in stressful situations.
+Tangible interfaces for mental well-being have not yet utilised the full potential of recent
+advancements in IoT, sensors and artificial intelligence. This research aims to explore the common
+technological and user-oriented challenges faced when developing modern tangible and embodied
+interfaces for mental well-being. Figure 1 shows the different types of challenges associated with the
+design and development of tangible Interfaces for mental wellbeing.
+TECHNICAL CHALLENGES
+While advancements in CPUs, microcontrollers and sensors have resulted in smaller, more
+computationally powerful and accurate devices there are still many challenges to overcome when
+developing mental well-being tangible interfaces. One of the most significant issues currently faced is
+the physical size of the devices as users prioritise the look and feel of tangible interfaces [18] [20].
+Mental well-being tangible interfaces must remain small and at the same time embed all of the
+required sensors, microcontroller and battery and while small powerful processors are available they
+increase the cost of such devices considerably.
+Sensor accuracy remains a challenge as to infer mental well-being highly accurate sensors are vital.
+Recent advancements have resulted in off the shelf physiological sensors such as those measuring
+heart rate variability (HRV) and Electrodermal activity (EDA) to detect stress with similar accuracy 
+as clinical grade sensors when they are paired with machine learning classifiers [16]. However, the
+machine learning classifiers must be first be trained with vast amounts of accurate real-world labelled
+data which can be difficult to obtain.
+Machine learning provides clear benefits but requires computationally powerful devices to run.
+Ideally, the classification models would be run on-device as this would reduce latency and increase
+privacy as user data would never be transmitted off the device. New devices such as the Raspberry Pi
+zero are capable of running simple classification models on-device however their limited ram and
+larger size still create challenges. Alternatively, small microcontrollers such as the Arduino Nano
+could be utilised but they only allow for the collection of data. One option to maintain the small
+footprint of the Arduino Nano but still utilise machine learning is to combine it with Bluetooth Low
+Energy to transmit the data to a mobile application which can run the classification model.
+Machine learning could also allow for the provision of personalised mental well-being inference.
+This provides a solution to one of the most challenging aspects when developing a one-size-fits-all
+tangible interface. Each device could be trained on the individual’s sensory data resulting in the more
+accurate inference of mental well-being state. However, to achieve personalised inference a large
+amount of data is required from each individual when experiencing different states of well-being. A
+novel solution to this is the development of tangible interfaces containing the necessary sensors in
+addition to embedded techniques to self-label allowing for the collection of large amounts of realworld labelled data that can then be used to accurately train machine learning models.
+Battery life is an increasing challenge as advancements in the development of more computationally
+powerful processors and additional sensors have outpaced advancements of batteries resulting in
+shortened battery life. Li-Po batteries are most suitable for mental well-being tangible interfaces as
+they are physically small and rechargeable, unlike 9v alkaline batteries which are commonly used
+with within the IoT. When developing tangible interfaces using Arduino Nanos and numerous
+physiological and environmental sensors Li-Po batteries between 500mAh and 1200mAh provided an
+average battery life of between 5 and 10 hours. While this is sufficient for the tangible interfaces if
+the machine learning classifiers were to run on-device this would reduce battery life significantly.
+Many of the above challenges concern the detection of mental well-being but if tangible interfaces
+are to also improve well-being there are additional challenges to be overcome. The primary challenge
+is the use of different feedback mechanisms including auditory, visual and haptic feedback which will
+need to be examined to confirm their capability to reliably improve mental well-being for the general
+population.
+USER-ORIENTATED CHALLENGES
+In addition to the technical challenges that exist there are also many new user-oriented challenges
+that need to be addressed, many of which are unique to tangible interfaces for wellbeing.
+Machine learning has been shown to provide many advantages when used to infer mental well-being
+but for it to be accurately trained a large amount of user data is first required making user
+engagement one of the largest challenges facing the accuracy of tangible interfaces. There are
+numerous reasons as to why user engagement is often low including digital competence as many
+users who experience mental health challenges may not possess high digital competence. However,
+research shows that tangible interfaces do not require high digital competence to be engaging which
+should result in any individual being able to use such devices [6][19].
+Stigma is another issue which could reduce user engagement as traditionally there is much stigma
+around mental health and the diagnostic tools used. To combat this stigma the tangible interfaces
+should be designed to appear inconspicuous, one method to accomplish this is by embedding the
+sensors into pre-existing, familiar devices such as toys for children. By making the devices
+inconspicuous they are immediately more familiar and approachable for people to use and less
+stigmatised.
+Given the stigma associated with mental health, security has to be a top concern for anyone
+developing or using tangible interfaces for mental well-being. Many users consider their mental
+health data to be highly personal and would not want it shared with any third parties. Because of the
+sensitive nature of the data on-device processing would be ideal as the data remains local and secure
+although this may not always be possible as additional computational power may be required.
+Legislation could help alleviate concerns as the General Data Protection Regulation (GDPR) [7] in
+the EU and EEA have attempted to give control to citizens over their personal data by ensuring they
+can access their data and understand how it is being processed. GDPR may help gain people’s trust in
+mental well-being tangible interfaces as it allows people to assess how their personal data is stored
+and processed.
+When developing devices to be used by people with mental well-being challenges it is essential to
+involve end users in the development process. Tangible interfaces for mental well-being were
+explored at focus groups at a school for students with severe, profound and complex learning and
+physical disabilities in Nottingham, UK, these focus groups highlighted additional challenges that
+must be addressed before mainstream adoption. The cost of the devices was a key concern as they
+must be affordable for the school or individuals to consider purchasing which can be addressed by
+using cheap off the shelf sensors and microcontrollers. Durability was another concern raised as
+children often drop and break technological devices. To address this concern tangible interfaces 
+specifically designed for children such toys have been developed, these provide additional protection
+for the electronic components but their durability remains a challenge. Students within the school also
+face fine and gross motor control issues making many technological solutions such as mobile apps
+challenging to use but by designing tangible interfaces to be easy to grip and durable it should
+improve the accessibility of such technology.
+Co-designing the tangible interfaces is also vital to ensure acceptance and high usability. Designing
+with people with cognitive impairments is vital because they are often overlooked as “if a mental
+health problem presents … it is more likely to be attributed to their learning disability (diagnostic
+overshadowing) or classed as challenging behaviour” [8]. Co-designing with people with cognitive
+impairments does present additional challenges such as legality issues regarding informed consent
+and the impact of participation as some participants may find it challenging when confronted by their
+own limitations. However, many of these challenges can be overcome using method stories [10]
+which describe how methods work in reality instead of how they ought to work in theory.
+Many of the user-oriented challenges are more difficult to overcome than the technological
+challenges but user adoption and engagement should be prioritised through co-design workshops to
+ensure the feasibility and acceptance of mental well-being tangible interfaces.
+CONCLUSION
+The emergence of mental well-being tangible interfaces and advancements in sensors, machine
+learning and microcontrollers suggest a new era of technological mental well-being tools, yet many
+challenges remain. This paper has pointed to a number of research challenges that warrant further
+investigation.
+Many of these challenges are technological including the physical size of many off-the-shelf sensors
+and microcontrollers, the battery life of devices and the processing power required for on-device
+machine learning but with current advancements these challenges should become less problematic.
+There are also many user-orientated challenges ranging from difficulties engaging users, co-design
+challenges and ensuring data privacy. While these challenges remain, it is imperative to involve end
+users at all stages of the design and development of mental well-being tangible interfaces to ensure
+effective interfaces are developed.
+Overall mental well-being tangible interfaces present a great opportunity for individuals to
+automatically monitor and improve their well-being but many challenges must be overcome by
+researchers to make this a reality. 
+REFERENCES
+[1] Lulwah Al-barrak, Eiman Kanjo, and Eman M. G. Younis. 2017. NeuroPlace: Categorizing urban places according
+to mental states. PLOS ONE 12, 9: e0183890.
+[2] Nouf Alajmi, Eiman Kanjo, Nour El Mawass, and Alan Chamberlain. 2013. Shopmobia: An Emotion-Based Shop
+Rating System. 2013 Humaine Association Conference on Affective Computing and Intelligent Interaction, IEEE,
+745–750.
+[3] Ruben T Azevedo, Nell Bennett, Andreas Bilicki, Jack Hooper, Fotini Markopoulou, and Manos Tsakiris. 2017. The
+calming effect of a new wearable device during the anticipation of public speech. Scientific Reports 7, 1: 2285.
+[4] Madeline Balaam, Geraldine Fitzpatrick, Judith Good, and Rosemary Luckin. 2009. Exploring Affective
+Technologies for the Classroom with the Subtle Stone. Proceedings of the 28th international conference on Human
+factors in computing systems - CHI ’10: 1623.
+[5] David Beattie. 2017. SqueezeMusic- HCI & Audio Interaction Research. .
+[6] José Bravo, Ramón Hervás, and Vladimir Villarreal. 2015. Ambient intelligence for health first international
+conference, AmIHEALTH 2015 Puerto Varas, Chile, December 1–4, 2015 proceedings. Lecture Notes in Computer
+Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics) 9456: 189–
+200.
+[7] European Comission. 2018. Data protection | European Commission. .
+[8] Alison Giraud-Saunders. 2011. Mental health in people with learning disabilities. .
+[9] J.A. Healey and R.W. Picard. 2005. Detecting Stress During Real-World Driving Tasks Using Physiological
+Sensors. IEEE Transactions on Intelligent Transportation Systems 6, 2: 156–166.
+[10] Niels Hendriks, Karin Slegers, and Pieter Duysburgh. 2015. Codesign with people living with cognitive or sensory
+impairments: a case for method stories and uniqueness. International Journal of CoCreation in Design and the Arts.
+[11] Eiman Kanjo, Daria J. Kuss, and Chee Siang Ang. 2017. NotiMind: Utilizing Responses to Smart Phone
+Notifications as Affective Sensors. IEEE Access 5: 22023–22035.
+[12] Eiman Kanjo, Eman M.G. Younis, and Chee Siang Ang. 2019. Deep learning analysis of mobile physiological,
+environmental and location sensor data for emotion detection. Information Fusion 49: 46–56.
+[13] Eiman Kanjo, Eman M.G. Younis, and Nasser Sherkat. 2018. Towards unravelling the relationship between onbody, environmental and emotion data using sensor information fusion approach. Information Fusion 40: 18–31.
+[14] Chelsea Kelling, Daniella Pitaro, and Jussi Rantala. 2016. Good vibes. Proceedings of the 20th International
+Academic Mindtrek Conference on - AcademicMindtrek ’16, ACM Press, 130–136.
+[15] Mark Matthews and Gavin Doherty. 2011. In the Mood: Engaging Teenagers in Psychotherapy Using Mobile
+Phones. Proceedings of the 2011 annual conference on Human factors in computing systems - CHI ’11.
+[16] Varun Mishra. 2018. The Case for a Commodity Hardware Solution for Stress Detection. Proceedings of the ACM
+International Joint Conference on Pervasive and Ubiquitous Computing: Adjunct: 1717–1728.
+[17] Karin Niemantsverdriet and Maarten Versteeg. 2016. Interactive Jewellery as Memory Cue. Proceedings of the TEI
+’16: Tenth International Conference on Tangible, Embedded, and Embodied Interaction - TEI ’16, ACM Press, 532–
+538.
+[18] Minna Pakanen, Ashley Colley, Jonna Häkkilä, Johan Kildal, and Vuokko Lantz. 2014. Squeezy bracelet.
+Proceedings of the 8th Nordic Conference on Human-Computer Interaction Fun, Fast, Foundational - NordiCHI
+’14, ACM Press, 305–314.
+[19] Iyubanit Rodríguez, Gabriela Cajamarca, Valeria Herskovic, Carolina Fuentes, and Mauricio Campos. 2017. Helping
+Elderly Users Report Pain Levels: A Study of User Experience with Mobile and Wearable Interfaces. Mobile
+Information Systems 2017: 1–12.
+[20] Federico Sarzotti. 2018. Self-Monitoring of Emotions and Mood Using a Tangible Approach. Computers 7, 1: 7.
+[21] Kieran Woodward and Eiman Kanjo. 2018. Things of the Internet (ToI). Proceedings of the 2018 ACM International
+Joint Conference and 2018 International Symposium on Pervasive and Ubiquitous Computing and Wearable
+Computers - UbiComp ’18, ACM Press, 1228–1233.
+[22] Kieran Woodward, Eiman Kanjo, Samuel Burton, and Andreas Oikonomou. 2018. EmoEcho : A Tangible Interface
+to Convey and Communicate Emotions. Proceedings of the ACM International Joint Conference on Pervasive and
+Ubiquitous Computing.
+[23] World Health Organisation. 2011. Based on the findings of the second global survey on eHealth Global Observatory
+for eHealth series-Volume 3 mHealth New horizons for health through mobile technologies'"
+3,"'Consumer packaged goods (CPG) are low-cost products that experience depletion upon each use [2].
+Packaged food, beverages, and toiletries are examples of CPGs. There is growing industry interest
+in moving CPGs towards the Internet of Things [7]; so that CPGs could collect information about
+their use and provide extra functionalities such as helping to reduce waste, supporting proper product
+usage, and enhancing the experience of using the products, among others.
+Figure 1: The participant cooking a meal.
+Until now there has not been a structured attempt to develop smart versions CPGs that fit into
+the practices (a specific ways of conducting a routine [11]) they are part of. Current smart CPGs are
+designed for a specific CPG and for specific situations of use (see examples [1, 10, 12]). We believe
+that a practice perspective [6] is useful to first understand how CPGs are used, and then based on
+that understanding develop design interventions [3].
+Here we aim to investigate whether it is possible to gain insights into how to develop design
+interventions for CPGs by understanding the use of CPGs in practice. For this purpose we develop a
+variety of methods, inspired by previous research, to represent the usage of CPGs. We took cooking
+as our research case an autoethnographic data sample [5] to demonstrate the application of our
+methods.
+METHODS AND DATA SAMPLE
+Table 1: Items Usage Counting: the tree
+most and least used CPGs and utensils.
+CPGs f Utensils f
+1 water 7 1 palette 13
+2 fish 5 2 lid 7
+3 greens 4 3 pan 7
+17 parley 1 11 google home 2
+18 peas 1 12 plate 2
+19 salt 1 13 knife 1
+Notes. f = frequency of item usage (number
+of times item was used during the cooking
+session; Total number of CPGs = 19; Total
+number of utensils = 13.
+Data Sample
+An author of this paper recorded a video of himself cooking a meal (a vegetables and fish dish). The
+video captured most of the participant’s activities from cooking preparation until serving the meal
+(See Figure 1).
+Methods
+CPGs Inventory. The first step to understand CPGs’ use is to know what CPGs are available in a
+person’s kitchen. Here, we created an inventory by recording an additional video of the CPGs in the
+participant’s kitchen. We included in the inventory CPGs that belong exclusively to the participant
+(personal) and CPGs that any member of the participant’s house could use (shared). In addition,
+to have an idea of the time that an item could be available, if not consumed, we included a rough
+estimate of the expected shelf life of CPGs: short (< 2 weeks) and long (> 2 weeks).
+Item Usage Counting. To attempt to know what and how relevant CPGs were for the cooking session,
+we noted the CPGs used in the cooking session and the number of times that they were used, inspired
+in part by [4]. We also include utensils in this counting, because they are closely associated to the use
+of CPGs. We considered only when items (CPGs and utensils) were used to accomplish something.
+Finding Design Opportunities for Smartness in Consumer Packaged Goods
+For example, when the participant grabbed a bottle of salt to add it to food, an usage of the salt was
+recorded, however, when the bottle of salt was moved to reach another spice, no usage was recorded.
+Table 2: CPGs’ Affordances.
+CPGs Affordances
+greens o,a,h,ct,p,s,d
+water a,cl
+kale o,a,h,p,s
+fish o,a,h,p,s,d
+oil o,c,a, h,s
+peas o,a,h,p
+red lentils a,h,p
+squash o,a,h,p,s
+parsley o,a,s
+black pepper o,c,a,s
+butter o,c,a,h,ct
+soap a,cl
+sponge cl
+cloth cl
+salt o,a,s
+chilli powder o,a,s
+cajun powder o,a,s
+basil dried o,c,a,s
+milk o,c,a,s
+Notes. o = opening, c = closing,
+a = adding, h = heating, ct = cutting, p = positioning, cl = cleaning, s = storing, and d = disposing of.
+CPGs’ Affordances. To get an understanding of how CPGs are used in a cooking session, we looked
+for CPGs’ affordances. An affordance is the relationship between the properties of an object and the
+capabilities of a person that determine how the object could be used [8]. In other words, the actions
+that a person could accomplish using an object. We noted the affordances that each of the CPGs used
+in the cooking session by examining the cooking session video.
+Consumption Estimation. To have an estimate of whether the CPGs could be used in more than one
+cooking session, we made an evaluation of whether the CPGs were used or used up. The estimates
+were made by the researcher through a visual inspection of the videos and his knowledge of the
+cooking session. An example of estimation is a bag of frozen green; if half of the content of the bag
+was consumed, but still, product remains in the bag which it was considered that was used.
+Network Visualizations. CPGs are not used in isolation, but rather in combination with other CPGs
+and utensils. To understand how people accomplish the work of cooking using CPGs and utensils,
+we represented visually all the relevant interactions that those items have between them, using
+Ognyanova source code [9]. As an illustrative example, for an onion that was sliced, we may have
+noted the following interactions: onion-chopping board, knife-onion, knife-chopping board, etc.
+Categorization of Specific Interactions. To capture situations that poses difficulties that the participant
+has to solve (trouble) or situations in which a creative or insightful technique helped to accomplish
+an activity (opportunity). We examine the videos to find and classify the interactions into those two
+categories according to our own subjective criteria. A trouble interaction was having to remove an
+extra amount of an ingredient while an example of an opportunity interaction was using an empty
+package as temporary rubbish.
+DEMONSTRATIONS
+CPGs Inventory. The participant had a total of 156 available CPGs, of which 81 (51.9%) were personal
+and 75 (40.1%) were shared. Of the 156 total CPGs, 24 (15.4%) were perishable and 132 (84.6%) were
+non-perishable. The participant used 19 CPGs in the cooking session; 12 (63.2%) personal and 7 (36.8%)
+shared. Out of those 19 CPGs, 7 were perishable (36.8%), and 12 non-perishable (63.2%). The results
+suggest that the participant used a greater percentage of shared and perishable CPGs than their
+percentage in regards to the total number of CPGs.
+Item Usage Counting. The participant used 19 unique CPGs in 46 occasions with a minimum of 1 and
+maximum of 7 interactions (mean = 2.42, SD = 1.66). The most used CPGs were water, fish, and greens
+Finding Design Opportunities for Smartness in Consumer Packaged Goods
+and red lentils. The participant interact with 13 unique utensils in 60 occasions with a minimum of 1
+and maximum of 13 interactions (mean =4.61, SD =2.97). The most used utensils were a palette, lid,
+and pan. The results suggest that both CPGs and utensils are used multiple times in a cooking session
+and that utensils are used more times than CPG.
+Table 3: CPGs Consumption Estimation.
+CPGs portion consumed
+greens 1/1 (up)
+water NA
+kale 1/3
+fish 2/3
+oil dash
+peas 1/4 (up)
+red lentils 1/4 (up)
+butternut squash 1/6
+parsley pinch
+black pepper pinch
+butter pinch
+soap dash
+sponge wear
+cloth wear
+salt pinch
+chilli powder pinch
+cajun powder pinch
+basil dried pinch
+milk dash
+Notes. portion consumed in relation to
+a CPG package; up = used up; Items arranged from top to bottom according to
+the order they were used.
+CPGs’ Affordances. We found 9 CPGs’ affordances: opening, closing, adding, heating, cutting, positioning, cleaning, storing, and disposing of. The most common affordance was ""adding"" and the least
+were ""disposing of"" and ""cutting"" with occurrences in 17 and 2 CPGs respectively (Table 2). ""Greens""
+had the most affordances (7) and ""sponge"" and ""cloth"" had the least (2) . Interestingly, spices (salt, chili
+powder, cajun, basil, and black pepper) have similar affordances with opening, closing and storing.
+The results suggests alike CPGs share many affordances, indicating that similar CPGs may be used in
+a similar manner.
+Consumption Estimation. We found that 3 of the 19 CPGs were used up, those being greens, peas, and
+red lentils (Table 3). Only 5 CPGs had a considerable used that is a relevant proportion of its total. For
+instance, a third of a kale package was consumed. For the other 13 CPGs, the consumption was a
+negligible part, for instance, a pinch of salt. The results suggests that most CPGs could be used more
+than one time, which is particularly true for non-perishable CPGs.
+Network Visualizations. The size of a node represents the number of interactions it had with other
+items and the edges represent interactions between nodes (See Figure 2). The proximity of nodes’
+centers inversely correlates with the number of interactions between them. The visualization gives a
+sense for the way items were used during a given cooking session; on the left side, the spices form
+a cluster that connects to food (lentils and squash). We could infer that those spices were used to
+season food. There are nodes that have a prominent size as they are connected to a large number of
+items. Palette is a central node and we could infer that it had a central role in the cooking process.
+Categorization of Specific Interactions. We found a total of 9 interactions in the cooking session of
+those 3 represent trouble interactions and 6 opportunity interactions (Table 4). Next, we provide a
+detailed description and a digital intervention idea for one trouble and one opportunity interactions:
+Fixing meal (as an opportunity) This refers to all actions related to improving the taste of food.
+Examples include seasoning the food, add extra ingredients or changing the cooking method.
+Intervention idea: CPGs could provide support to users about how to season food. While a person
+is cooking a meal, CPGs could indicate that they go well with a food.
+Unorthodox action (as a trouble) Actions on which the person makes an unorthodox use of
+CPGs or utensils. Using a knife to get a portion of mayonnaise from a jar is an example of this.
+Intervention idea: CPGs could take advantage of the hidden unorthodox use of their products.
+CPGs could be re-designed to better adapt to the ways that people use.
+Finding Design Opportunities for Smartness in Consumer Packaged Goods
+Figure 2: Network visualization that represents the interactions between CPGs and utensils during a cooking session.
+The classification of the interactions could represent areas for design opportunities as could give
+designers and researcher situations worth to explore.
+DISCUSSION
+Our proposed methods suggest that it is possible to get an understanding of how CPGs are used
+by focusing on different perspectives and granularity of CPGs usages. Such understanding could
+inspire different interventions, ranging from general (identifying available CPGs in the kitchen) to
+Finding Design Opportunities for Smartness in Consumer Packaged Goods
+specific (revealing the formation of clusters of CPGs). An example of an intervention could be the
+development of a system that recommends recipe meals based on the available CPGs at home. This
+could be accomplish by equipping CPGs with low cost sensors that allows them to communicate with
+a system at home to indicate their presence.
+Table 4: Trouble and Opportunity Interactions: short description, frequency and
+trouble to opportunity ratio
+Category f (T:O)
+1 CPGs and utensils placing 2(0:2)
+positioning CPGs and/or utensils
+2 fixing meal 2(1:1)
+actions to improve food taste
+3 unhygienic action 2(2:0)
+not being clean enough
+4 extra activities 1(0:1)
+activities carried out while waiting
+5 unorthodox action 1(0:1)
+actions that deviate from the norm
+6 use of technology 1(0:1)
+use of devices with computational power
+Notes. f = frequency of category out of a total of 9
+interactions; T:O = trouble to opportunities ratios.
+The main limitation of our study is the lack of implementations. Although we used a data sample
+as a way to demonstrate our results, we have not applied our methods in a large number of people,
+and as now the potential of our methods are only speculations. The results and the applications of
+our methods may vary with a large number of people and with a longer implementation. We could
+expect, for instance, our way of counting the interactions between CPGs and utensils to be very time
+consuming and that may restrict the application in a large number of people.
+To summarize, the methods proposed in this paper appear to represent in a fairly acceptable manner
+how CPGs are used and provide insights for design interventions. As with any attempt to represent
+the real world, those methods may focus on as well as exclude some information. We may argue
+for the implementation of the methods in a large number of people. Our immediate next steps will
+involve both the inclusion of more participants and working towards refining our analysis methods.
+ACKNOWLEDGMENTS
+This work was supported by the Horizon Centre for Doctoral Training at the University of Nottingham
+(UKRI Grant No. EP/P510592/1) and by Unilever UK Ltd'"
+4,"'Ultra-reliable and Low Latency Communication (URLLC)
+is one of the target use cases for 5G [1]. However, the
+performance requirements for this type of traffic are not yet
+met for challenging use cases such as the industrial Internet
+of Things (IoT). Moreover, little work has been done on the
+medium access control (MAC) layer of massive multipleinput multiple-out (MIMO) [2], a key technology for 5G, and
+mechanisms for URLLC traffic are lacking.
+In this paper, we present a MAC scheme for alarm traffic
+in industrial control networks based on massive MIMO. In
+massive MIMO, pilots — known signals needed to obtain
+channel state information (CSI) for each user [2] — are a
+limited resource. We formulate the general problem of allocation of pilot signals to alarm sources, which trigger alarms
+when unusual events occur, for example machine failures or
+control values detected outside of a specified safe parameter
+range. We present an algorithm for efficient pilot allocation
+that guarantees alarm delivery. We performed a simulation
+study which shows good performance of our algorithm, with
+This work was supported by the National Science Centre, Poland, under
+grant no. 2017/25/B/ST7/02313: “Packet routing and transmission scheduling
+optimization in multi-hop wireless networks with multicast traffic”. The
+work of Emma Fitzgerald was also partially supported by the Celtic-Next
+project 5G PERFECTA, the SSF project SEC4FACTORY under grant no.
+SSF RIT17-0032, and the strategic research area ELLIIT.
+varying numbers of alarms and alarm trigger probabilities. In
+the average case, for an alarm trigger probability of 1% per
+alarm and slot, less than 1.5 pilots per time slot needed to be
+reserved for alarm traffic, and alarms were delivered within
+two slots. In the worst case, alarms are delivered within an
+average of just over 4 slots, with at most 3.5 pilots needed
+per slot. The length of a time slot in our scheme is equal to
+the transmission time interval, which in 5G can be as short
+as 125 µs [3].
+With the rise of Industry 4.0 comes a greater need for
+flexibility in manufacturing and other industrial processes
+[4], [5]. Key features of Industry 4.0 include optimisation
+and customisation of production, automation and adaption,
+and automatic data exchange and communication, while realtime capability, decentralisation, and modularity are some of
+the important operating principles [5]. These trends will be
+facilitated by the transition to wireless communications for
+industrial control processes, allowing for cheaper and more
+scalable communications, with reduced cabling costs and the
+ability to easily reconfigure the factory floor. However, as
+yet, the development and deployment of wireless protocols
+suitable for real-time communication in this context is limited,
+since existing protocols are not able to meet the stringent
+requirements of industrial control traffic in terms of latency
+and allowable packet loss rates [6], [7].
+Massive MIMO is a promising technology in this domain.
+Diversity gain can greatly increase the reliability of communications for industrial systems [8]; for example, with no
+diversity gain, a 90 dB margin is needed in the fading gain
+in order to reach a channel outage probability suitable for
+factory or process automation, while with a diversity order of
+15, this is reduced to 9 dB. In massive MIMO, the use of up
+to hundreds of antennas inherently provides a high degree of
+spatial diversity, equal to the number of antennas when using
+maximum ratio combining, or the number of antennas minus
+the number of concurrent users for zero forcing [2]. Moreover,
+an effect known as channel hardening [9], [10] makes massive
+MIMO channels behave more like wired channels, smoothing
+out channel variations and providing predictable performance.
+This effect is facilitated by low correlation between the
+channels of different users. The otherwise challenging radio
+arXiv:1909.11482v1 [cs.NI] 25 Sep 2019
+environment of a factory [8] is thus turned into a strength,
+as its metallic fixtures and moving machine tools and robots
+provide a rich multipath channel propagation environment
+that aids the differentiation of user signals in massive MIMO
+systems.
+In order to take advantage of the benefits promised by
+massive MIMO for industrial communications, suitable MAC
+protocols are needed. However, thus far, work on massive
+MIMO MAC for the IoT is limited, especially when it comes
+to URLLC. A few recent works consider random access and/or
+grant-free protocols for massive MIMO in IoT scenarios [11]–
+[13]. In particular, [14] argues for the advantages of massive
+MIMO over other technologies in the presence of massively
+many devices, each only transmitting intermittently. Scheduled
+access for periodic IoT traffic has also been considered in [15].
+However, none of these works cater to the particular needs of
+industrial control traffic, in terms of packet loss and latency
+guarantees, which we address in this paper.
+The rest of this paper is organised as follows. In Section II,
+we formulate the pilot allocation problem and define our
+traffic model and performance requirements. Section III then
+presents our pilot allocation algorithm based on a new concept
+that we call collision trees. Section IV details our simulationbased performance study and results, and finally Section V
+concludes this paper.
+II. PILOT ALLOCATION FOR ALARM TRAFFIC
+The problem we will address is pilot allocation for alarm
+traffic in a 5G industrial Internet of Things scenario. Typically,
+in such a use case a dedicated network (or network slice)
+would be used, and so we do not consider traffic for other
+applications. In this scenario, a massive MIMO base station
+provides communications for both continuous control traffic
+and sporadic, but critical, alarm traffic. In order to communicate, both these traffic classes must be allocated pilot signals,
+in such a way as to guarantee the delivery of alarms, while
+also maintaining high performance for the control traffic.
+A. Massive MIMO Transmission
+Here we will provide a brief overview of transmission in
+massive MIMO systems; a more comprehensive treatment can
+be found in [2]. Transmission in time division duplex-based
+massive MIMO occurs in coherence blocks, consisting of a
+time interval and frequency band across which the channel is
+constant, to within a small margin of error. Each coherence
+block contains a number of channel resource elements, which
+can each be used for downlink or uplink data, or (uplink)
+pilot signals. Pilot signals are used to measure channel state
+information for each user, and must be orthogonal. The CSI
+is then fed into the preprocessing matrix used to direct each
+data stream to its respective recipient on the downlink. or
+differentiate each incoming data stream on the uplink.
+If two users transmit the same pilot signal in the same
+coherence block, the CSI for these users will be inaccurate and
+data to or from them will be encoded or decoded incorrectly.
+This phenomenon is known as pilot contamination, and effectively results in a collision between the user transmissions
+in the same way as interference in single-antenna wireless
+systems does. Collisions can be avoided by allocating each
+user a unique, orthogonal pilot, but for sporadic alarm traffic,
+this would result in a very inefficient use of resources, since
+most of the time these pilots will go unused.
+One key difference between collisions due to pilot contamination and collisions in single-antenna systems is that
+with the former, the base station is able to communicate to
+all users involved in a collision via a multicast transmission
+using their combined CSI; effectively, the contaminated pilot
+provides CSI for all the involved users as a group. If the
+users in the group have very different received power, some
+of them may fail to receive such a transmission, however,
+in our scenario this is unlikely, since we have small, indoor
+cells and so no user will be very far from the base station.
+Multicast transmissions to a specific group of users involved
+in a collision give us new possibilities to handle collisions, for
+example by allocating dedicated resources (pilots) for collision
+resolution. In our proposed algorithm in Section III, we will
+make use of this capability.
+B. Traffic Classes and Requirements
+Efficient pilot allocation depends on the traffic to be served,
+so as to strike the right balance between wastage of resources
+due to collisions and that due to unused pilots. In our scenario,
+the traffic consists of two classes: control traffic and alarm
+traffic. Control traffic encompasses the transmissions between
+machines on the factory floor and their controllers. This traffic
+is regular, in some cases even deterministic, and has stringent
+latency requirements in order to arrive within a specified
+control loop period. In this work, however, alarm traffic will
+be the main focus, while control traffic will be regarded as
+base load traffic, for which we will evaluate the performance
+impact of serving the alarm traffic. Alarms are infrequent
+and unpredictable, but nonetheless must be delivered reliably,
+making resource allocation for alarm traffic challenging. Our
+goal is thus to provide delivery guarantees for alarm traffic,
+while minimising the pilot resources required to do so.
+There are two key performance requirements for industrial
+automation traffic, latency and packet loss probability, and
+their values depend on the specific industrial automation domain. The domains we will focus on are process automation,
+with an update frequency of 10 to 1000 ms, and factory
+automation, with an update frequency of 500 µs to 100 ms
+[7]. These two domains are of interest in this work because
+their update frequencies are sufficiently fast to require pilot
+allocation strategies that cater specifically to them, while also
+slow enough to be feasible to realise using the 5G transmission
+time interval, which ranges from 125 µs to 1 ms [3].
+The packet loss rate required for our targeted domains
+is 1 × 10−9
+[7]. This extremely low loss rate includes all
+potential causes of packet loss, so we will aim for 100%
+delivery guarantees in our pilot allocation strategy; that is, no
+packet should be lost due to a failure in resource allocation
+(after collision resolution). The packet loss rate and latency
+requirements should thus be considered jointly, as they are
+inherently tied together by the pilot allocation scheme. Packet
+loss can still occur for other reasons, such as noise, but this
+is beyond the scope of the current work.
+C. Alarm Traffic Model
+The performance of any given pilot allocation strategy
+depends on the characteristics of the alarm traffic. We will
+adopt the following alarm traffic model. We define a window
+consisting of T time slots. Each slot represents one coherence
+interval, in which there may be multiple coherence blocks
+at different frequencies. Within each slot, there are P pilots
+available in total, and each pilot can be assigned to one or
+more users for that slot. If two or more users are assigned
+the same pilot in a given slot, a collision can occur if both
+of them transmit during the slot. A pilot can also be unused
+(wasted) if its assigned user(s) do not transmit in the slot.
+We have a set A of alarm sources, each of which represents
+one type of alarm that can arise during the window. The
+window should be limited in time, as defined above, for two
+reasons. First, the set of alarms that may occur can change
+over time, for example when the factory floor is reconfigured.
+Second, the time scale at which alarms need to be served
+may be very different to that at which they are reset. For
+example, an alarm may be triggered upon the malfunction
+of a given machine, necessitating that the machine be shut
+down quickly. However, the time to repair the machine may
+be much longer, and while the machine is nonoperational, it
+is no longer possible for that alarm to be triggered again. The
+window should therefore be an interval in time in which the
+set of possible alarms is constant.
+Each alarm a ∈ A has a probability p(a) to be triggered
+during each slot, but once triggered, an alarm cannot be
+triggered again within the window. While in reality, alarm trigger probabilities could be correlated, we begin by assuming
+independent alarms to simplify the analysis, and will consider
+correlated alarms in future work. Each triggered alarm also
+has a deadline: a number of slots within which it must be
+successfully received by the base station. If a given alarm is
+not successful on its first transmission attempt, for example if
+there was a collision, it will attempt retransmission up until its
+deadline according to the pilot allocation scheme. We assume
+that all alarm messages are short enough to be transmitted
+within a single slot.
+D. Pilot Allocation Problem
+Our problem is then to define a pilot allocation scheme
+that guarantees delivery of all alarms within their deadlines.
+A naive strategy could be to simply assign one pilot to each
+alarm, in every slot. This would certainly guarantee alarm
+delivery, but would be very inefficient since the probability of
+any alarm being triggered at all is very low, let alone in a given
+slot. Moreover, if there are many possible alarms, then there
+may not be enough pilots in each slot to uniquely assign one
+to each alarm source. Our goal will therefore be to minimise
+the number of pilots that need to be assigned to alarms, while
+still guaranteeing delivery.
+Formally, we can define a pilot allocation scheme as a
+finite sequence of pilots defined for each alarm source. A
+given alarm source, when its alarm is triggered, begins by
+transmitting the alarm message in the next slot using the first
+pilot in its pilot sequence. If there is a collision, it attempts
+retransmission in the following slot, using the second pilot
+in its sequence. The alarm source will know that there is a
+collision because it will fail to receive an acknowledgement
+from the base station during the downlink phase of the
+coherence block in which it transmits. Upon further collisions
+the alarm source proceeds along the sequence, one slot at a
+time, until it reaches the end: its final retransmission attempt.
+A pilot sequence may also contain blank pilots, indicating
+that the alarm source remains silent in the corresponding slot
+instead of attempting retransmission.
+When a collision occurs, the base station can optionally
+transmit a pilot offset to all alarm sources involved in the collision, using a multicast transmission as described in Section
+II-A. In this case, the alarm sources add the pilot offset to
+the next value in their pilot sequences. For example, if alarm
+a ∈ A has pilot 1 as its next allocated pilot, and alarm b ∈ A
+has pilot 2 as its next pilot, then if the base station transmits
+a pilot offset of 10, alarm a will transmit using pilot 11 in the
+next slot, and b will transmit using pilot 12. The pilot offset
+thus allows for dynamic pilot allocation by the base station,
+while still having fixed, pre-determined sequences for each
+alarm source. As we will see in Section III, this can simplify
+collision resolution, since each collision can be resolved in its
+own pilot range in parallel with any new alarm transmissions.
+A sufficient condition to guarantee alarm delivery within the
+deadline is that each pilot sequence should be no longer than
+the number of slots from an alarm triggering until its deadline,
+and that the last pilot in each alarm’s sequence should be
+unique across the set of alarms. If an alarm source has a
+unique pilot allocated to it in a given slot, then it will be able
+to transmit its alarm message without any risk of a collision,
+thus guaranteeing delivery in that slot. Since there is no reason
+to continue retransmission once collision-free transmission is
+guaranteed, we specify that the unique pilot condition should
+be met for the last pilot in each sequence. Then, if the length
+of the sequence is no more than the number of slots until the
+deadline, the alarm will be sent without collision in the worst
+case during the last slot before the deadline.
+III. PILOT ALLOCATION USING COLLISION TREES
+In this section we will present an efficient pilot allocation
+algorithm that can guarantee alarm delivery. Our algorithm
+is based on a concept we call collision trees, a method for
+assigning pilot sequences to alarms such that alarms with
+lower trigger probabilities have longer sequences and share
+pilots with other alarms more often. Shared pilots entail a
+risk of collision, if at least two of the alarms sharing the pilot
+are triggered at the same time, and therefore it is beneficial
+for lower probability alarms to share pilots more than higher
+Fig. 1. Example of pilot allocation for alarm transmission and collision
+resolution. After collision 1, four pilots are allocated in the following slot
+for collision resolution. This does not resolve all alarms in the collision, so
+a further two pilots are allocated in the next slot, after which the collision
+is resolved. Similarly, Collision 2 requires first four pilots, then two, then
+finally one in the third slot following the initial transmission.
+probability alarms. The authors’ Python implementation of the
+collision tree algorithm [16] is available for download and use
+under the GNU General Public License.
+A. Algorithm Description
+We begin by allocating a single, common pilot for all alarms
+in all slots. The common pilot is used for the initial alarm
+transmissions of alarm sources without requiring a prior grant
+for channel access. In the best case, all alarms triggered in
+the window will arrive in different slots, and no further pilots
+will need to be allocated for them. as they will each transmit
+without collision on the common pilot.
+In the event of a collision, however, we resolve the collision
+in its own, isolated pilot range, facilitated by the base station
+transmitting a pilot offset to all involved alarm sources.
+This allows us to consider only the alarms involved in the
+collision, and ignore any further alarms that arrive during
+collision resolution, as these will be sent using the common
+pilot, and then, if necessary, undergo collision resolution in
+a separate pilot range not affecting the original collision
+resolution process. This somewhat reduces the efficiency of
+collision resolution, however it greatly simplifies the design
+of the pilot allocation scheme and allows us to more easily
+guarantee alarm delivery. An example of pilot allocation with
+collision resolution is shown in Figure 1.
+Once a collision has occurred, the involved alarm sources
+attempt retransmission according to their predefined pilot
+sequences (see Section II-D). To design these sequences,
+we will use collision trees, inspired by the trees used to
+create Huffman codes [17]. A collision tree T = (V, E)
+is constructed as follows. We begin with the set of alarms
+A, together with their trigger probabilities p(a), a ∈ A.
+Each alarm will become a leaf in the collision tree. We then
+combine the two alarms with the lowest probabilities, making
+them children of a parent node that also has a probability
+associated with it, namely the probability of at least one of
+its children (alarms) being triggered.
+We then repeat the procedure, combining the two nodes
+with the lowest probabilities that do not yet have parent nodes,
+by making them children of a newly created parent node. The
+Fig. 2. An example collision tree with five alarm sources. Leaf nodes
+representing alarms are shown in grey. Each node’s probability is shown
+below it, and the pilot assigned to each node is shown in blue to its right.
+probability for the new node is given by the probability of at
+least one of the alarms in its child subtree being triggered.
+This process continues to iterate until finally we are left with
+a single node, which will become the root node of the tree,
+and whose probability is equal to the probability of any alarm
+being triggered in a given slot.
+For a given node v ∈ V in the tree, the probability that at
+least one of the alarms in its subtree is triggered is given by
+π(v) = 1 −
+Y
+l∈L(v)
+(1 − π(l)), (1)
+where L(v) is the set of leaf nodes descended from v, and
+where π(l), for l ∈ V a leaf node of the tree, is equal to the
+probability of the associated alarm being triggered. That is,
+π(l) = p(a(l)), where a(l) ∈ A is the alarm associated with
+leaf node l ∈ V.
+Once the tree has been constructed, we need to assign pilots
+to each node in the tree. Each level of the tree represents one
+time slot in the collision resolution process, and so nodes
+in the tree must be assigned pilots unique within their level.
+This is feasible so long as the number of nodes in any level
+does not exceed the total number of pilots available in each
+time slot. To assign pilots, we simply label the nodes in each
+level with pilot numbers, starting from 1 and increasing up
+to the number of nodes in the level. The root of the tree is
+assigned the common pilot for initial alarm transmissions. To
+determine the pilot sequence for a given alarm, we can then
+read, in order, the pilots assigned to each node in the path
+from the root to the leaf node corresponding to the alarm.
+An example of a collision tree is shown in Figure 2, for
+five alarms a1 . . . a5, with trigger probabilities p(a1) = 0.6,
+p(a2) = 0.35, p(a3) = 0.3, p(a4) = 0.15, and p(a5) = 0.15.
+First, a4 and a5 are combined, since they have the lowest
+trigger probabilities, and placed as children of a new node
+v4. The probability for v4 is given by π(v4) = 1 − (1 −
+0.15)(1 − 0.15) = 0.278. The next two orphan nodes (nodes
+without a parent) with the lowest probabilities are then a2
+and a3, which are placed as the children of a new node v3,
+with probability 1 − (1 − 0.3)(1 − 0.35) = 0.545. Now the
+two orphan nodes with the lowest probabilities are v3 and v4,
+so they are placed as the children of a new node v2, with
+probability 1 − (1 − 0.35)(1 − 0.3)(1 − 0.15)(1 − 0.15) =
+0.671. Finally, we only have two orphan nodes remaining,
+so they are placed as the children of the new root node v1,
+with probability 0.869, which is the probability of at least one
+of the alarms triggering. The resulting collision tree has four
+levels, corresponding to a maximum of four slots needed to
+resolve all alarms. The maximum number of pilots that would
+need to be reserved in any slot is four in slot t + 3, where t
+is the slot in which the alarms were first transmitted.
+B. Performance Analysis
+There are two key performance metrics that are of interest
+in assessing the quality of a given pilot allocation scheme. The
+first is the delivery time for the alarms, and the second is the
+expected number of pilots reserved for alarms, as these then
+cannot be used for control traffic. The delivery time can be
+considered both for each individual alarm, and for the entire
+set of alarms, by taking aggregate measures across the set. The
+maximum delivery time for any given alarm is given simply
+by the length of its pilot sequence. For collision tree-based
+allocation, this is equivalently the length of the path from the
+leaf node associated with the alarm to the root of the tree.
+We can express this as Dˆ(a) = |R(l(a))|, where Dˆ(a) is
+the maximum delivery time for alarm a ∈ A in time slots,
+l(a) ∈ V is the leaf node in the tree associated with alarm a,
+and R(v), v ∈ V, is the path from a node v to the root of
+the tree, consisting of the parent node of v, followed by the
+parent node of v’s parent, and so on up to the root node. The
+maximum delivery time can be used to determine whether or
+not alarm a can be guaranteed delivery within its deadline; if
+Dˆ(a) is less than or equal to the number of time slots until
+a’s deadline, then delivery within the deadline is ensured.
+By default, our collision tree algorithm guarantees delivery
+of all alarms, but not necessarily within their deadlines.
+However, by checking the maximum delivery time of each
+alarm against its deadline, the tree can easily be modified
+to ensure all alarms meet their deadlines, albeit with some
+loss of performance. This can be done by moving an alarm
+node l(a) up the tree along R(l(a)) until Dˆ(a) is within the
+deadline. First l(a) is moved up one level to become a sibling
+of its parent, with its grandparent node as its new parent. If
+the deadline is still not met, this procedure is repeated so
+that l(a) next becomes a sibling of its grandparent, then its
+great-grandparent, and so on as needed.
+In addition to the maximum delivery time, the expected
+delivery time for each alarm is also important. Even though
+the deadline represents the absolute latest time an alarm can
+be delivered, not all delivery times within the deadline are
+necessarily equal: it may be beneficial to deliver the alarm
+sooner rather than later. Our collision tree algorithm seeks
+to minimise the probability that an alarm will use its entire
+pilot sequence in order to be delivered, and so the expected
+delivery time will be significantly shorter than the maximum.
+Note that while delivery time is analogous to codeword length
+in Huffman codes, its analysis is more complicated because
+alarms do not always use their full pilot sequence, that is, the
+expected delivery time for each alarm is in general not equal to
+its maximum delivery time. Since Huffman codes are optimal
+in terms of encoded message length [17], our collision trees
+will also be optimal in terms of maximum delivery times of
+alarms, but not necessarily in terms of expected delivery time:
+more analysis is needed to prove or disprove this result, and
+will be the subject of our future work.
+The expected delivery time for an alarm a ∈ A depends on
+the collision probabilities at each node r ∈ R(l(a)) — the
+probability of a collision occurring on the pilot assigned to
+node r during its slot. This probability is given by
+c(v) = 1 −
+X
+l∈L(v)
+π(l)
+Y
+m∈L(v)\{l}
+(1 − π(m)) −
+Y
+l∈L(v)
+(1 − π(l)), (2)
+that is, the complement of the probability that either none of
+the alarms sharing the pilot assigned to v were triggered, or
+only one of them was: as soon as two or more alarms transmit,
+a collision will occur.
+However, when determining the expected delivery time of
+a given alarm a, that specific alarm must have been triggered,
+and so we need to find the conditional collision probability
+given that a was triggered. In this case, it is sufficient for any
+one of the other alarms also covered by v to be triggered, and
+so the conditional probability of a collision at v given a was
+triggered is
+c(v, a) = 1 −
+Y
+m∈L(v)\{l(a)}
+(1 − π(m)). (3)
+The expected delivery time for alarm a is then given by
+E [D(a)] = 1 + X
+r∈R(l(a))\{v0}
+c(r, a). (4)
+where D(a) is the random variable representing the delivery
+time of alarm a, and v0 is the root node of the tree. The minimum delivery time is always one slot, representing the case
+when the alarm is delivered straight away without collision.
+In the event of a collision, an additional slot is then added for
+each node along the path R(l(a) at which there is a collision.
+Note that a collision at node v ∈ V also implies a collision at
+all nodes along R(v), and the collision probability at any leaf
+node is 0. Finally, in order to obtain an aggregate performance
+metric across all alarms, we can take the average delivery time
+across the alarms as
+D =
+1
+|A|
+X
+a∈A
+E [D(a)] . (5)
+Our second performance consideration is the effect of our
+pilot allocation scheme on the control traffic, in terms of
+the total expected number of pilots reserved for alarm traffic
+per slot, including pilots allocated for collision resolution.
+However, calculating the expected number of reserved pilots
+with our alarm traffic model is not straightforward, since
+once an alarm is triggered, it can no longer be triggered
+again. It is thus removed from the set of possible alarms,
+and consequently, the probability of a collision will be lower
+in subsequent slots, meaning that the expected number of
+reserved pilots for each slot will reduce monotonically as we
+move through the time window and alarms are triggered. To
+calculate the expectation over all slots, we would therefore
+need to consider all possible combinations of which alarms
+could trigger in the same slots, and in which order, which is
+not feasible to do in practice.
+We will therefore take as a performance measure the a
+priori expected number of pilots reserved per slot, that is, the
+expected number of pilots needed for alarms per slot assuming
+all alarms can be triggered. This will give an upper bound on
+the true expectation where alarms can only be triggered once.
+The a priori expected number of pilots reserved for alarm
+traffic is given by
+Eˆ[P] = 1 + X
+v∈V\{v0}
+c(R(v)), (6)
+where Eˆ denotes the a priori expectation as defined above,
+P is the random variable representing the number of pilots
+reserved for alarm traffic per slot, and R(v), v ∈ V, is the
+parent node of v. One pilot is needed for each node whose
+parent node has a collision, with an additional pilot for the
+root node (the common pilot reserved in all blocks for alarms).
+The two performance metrics discussed here do not take
+into account the effect of alarms being removed from the set
+of possible alarms after they have been triggered, and so will
+overestimate the real performance. However, they provide an
+indication of the worst case performance, when no alarms
+have yet been triggered, and so assist with dimensioning the
+network. Further, these metrics provide a means to compare
+different collision trees, produced either by the algorithm
+given in Section III or others. For example, these metrics
+could be used to optimise the collision tree, which we intend
+to explore in our future work.
+IV. SIMULATION STUDY
+In order to empirically test the performance of the collision
+tree algorithm, we implemented a simulator in Python for
+alarm pilot allocation, along with numerical functions for the
+performance metrics detailed in Section III-B. The full code
+is available online [16].
+A. Simulation
+The simulation proceeds as follows. First, a set of alarms A
+is generated, each a ∈ A with a per time slot trigger probability p(a) between 0 and p, where p is a simulation parameter.
+We tested the following values of p: 0.001, 0.005, 0.01, 0.05,
+0.1, and 0.5. While some of these trigger probabilities are
+unrealistically high for practical scenarios, they are useful to
+find the limits of the system’s capabilities. The number of
+alarms in A, that is |A|, was also varied, from 10 to 100
+in steps of 10. Note that this is the total number of possible
+alarms that can arrive, but the actual triggering of these alarms
+depends on the trigger probabilities and not all will necessarily
+be triggered during any given simulation.
+   	 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig. 3. Delivery times for alarms with trigger probability upper bound
+p = 0.01, average across all simulation runs and instances (Simulation
+average), maximum for each simulation run, averaged across all runs and
+instances (Simulation max), and analytical average delivery time D (Analysis,
+Equation (5)).
+For each configuration of these two parameters, 20 problem
+instances (instances of A along with p(a) ∈ [0, p] for each
+a ∈ A) were generated. For each such instance, a collision
+tree was built from the trigger probabilities p(a) using the
+algorithm described in Section III-A. From the collision tree,
+we calculated the analytical performance metrics, specifically,
+the average alarm delivery time (Equation (5)) and the a priori
+expected number of pilots used per slot (Equation (6)). Finally,
+the actual simulation was then run 50 times for each instance,
+with a window size of 50 slots.
+During the simulation, in each slot, a random number is
+drawn between 0 and 1 for each alarm that has not yet been
+triggered. If this number is lower than the alarm’s trigger
+probability p(a), the alarm is triggered in that slot. If more
+than one alarm is triggered, a collision occurs and is resolved
+using the collision tree in subsequent slots. Once the window
+has ended, no more alarms are triggered, but the simulation
+continues until all remaining collisions are resolved.
+B. Results
+A selection of simulation results are shown in Figures 3 and
+4. Full results can be obtained by downloading and running
+the simulation code from [16]. We show here the results
+for p = 0.01, which gives relatively high but nonetheless
+realistic trigger probabilities. For some simulations, no alarms
+are triggered. In these cases, both the average and maximum
+delivery times were set to 1.0, as were the average and
+maximum pilots per slot, since an alarm always needs at least
+one pilot in one slot to be delivered and this thus gives a
+minimum value. All results are shown with 95% confidence
+intervals,
+The maximum delivery time for a given alarm can be
+theoretically as high as |A| slots in the worst case, when
+the collision tree is unbalanced such that there is one leaf
+for each level in the tree. However, as the delivery time
+results (Figure 3) show, in practice the delivery times 
+   	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig. 4. Pilots reserved for alarms per slot with trigger probability upper
+bound p = 0.01, average across all simulation runs and instances (Simulation
+average), maximum for each simulation run, averaged across all runs and
+instances (Simulation max), and analytical average delivery time Eˆ[P]
+(Analysis, Equation (6)).
+shorter using our collision tree algorithm, on average less than
+2 slots and with a maximum of around 4 slots for p = 0.01.
+The analytical average delivery time tracked the maximum,
+giving an indication of the worst case performance, and it
+provides an upper bound for the actual average, since it does
+not take into account alarms being removed after they are
+triggered. Delivery times increased with p, however even for
+the highest value tested, p = 0.5, and with 100 alarms, the
+maximum delivery time was less than 8 slots and the average
+around 4 slots, showing that our algorithm effectively controls
+the delivery time even in challenging cases.
+The collision tree algorithm also showed good performance
+with regards to the number of pilots reserved for alarms per
+slot (Figure 4). Here, the analytical metric Eˆ[P] followed the
+simulation average for low to medium values of p, although
+at higher values the analysis diverges from the simulation
+average. The maximum number of pilots reserved for alarms
+was approximately 3.5 pilots with 100 alarms and a maximum
+trigger probability of 0.01. This shows that the disruption to
+control traffic is limited, even in cases where many alarms
+are triggered at once. Moreover, the average number of pilots
+reserved per slot was very low, less than 1.5. The collision
+tree algorithm is thus able to guarantee alarm delivery while
+making very efficient use of pilot resources for realistic alarm
+traffic. As p increases, both the average and maximum number
+of pilots used also increase, with a maximum number of pilots
+of 17.5 for p = 0.1 and 56 for p = 0.5. This gives an
+indication of the maximum traffic that can be accommodated
+by a single base station using our approach.
+V. CONCLUSION
+In this paper we have studied a new problem in URLLC
+traffic in 5G networks, that of massive MIMO pilot allocation
+for alarm traffic in industrial Internet of Things scenarios, in
+particular factory and process automation. We have presented
+a grant-free random access scheme for alarm traffic, together
+with an algorithm for pilot collision resolution that can
+guarantee alarm delivery while making efficient use of pilot
+resources. In our future work we plan to further investigate
+the performance when alarm deadlines are shorter than their
+initial assigned pilot sequence length, necessitating moving
+some alarms further up the collision tree. We also aim to find
+optimal collision trees and compare them with those generated
+using our algorithm, as well as compare the performance
+of collision trees with other contention resolution methods.
+Other possible directions for future work include modelling
+and simulation of control traffic, as well as studying different
+traffic distributions for alarms and correlation between alarm'"
