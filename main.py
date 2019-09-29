@@ -1,4 +1,4 @@
-import xapian
+# import xapian
 import os
 import sys
 import re
@@ -6,21 +6,19 @@ import nltk
 import string
 import pandas as pd
 import csv
-
 from nltk.tokenize import word_tokenize
-from nltk.corpus import wordset
+from nltk.corpus import wordnet
 from nltk.corpus import stopwords
 from nltk.corpus import words
 
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
+# nltk.download('punkt')
+# nltk.download('stopwords')
+# nltk.download('wordnet')
 
 stop_words = stopwords.words('english')
 
 fdf = pd.read_csv("fulltext.csv")
-adf = pd.read_csv("summaries.csv")
-
+adf = pd.read_csv("summaries.csv",header=None)
 no_full = fdf.shape[0]
 no_abs = adf.shape[0]
 
@@ -58,11 +56,11 @@ def clean(t):
 abstracts = []
 fulls = []
 
+# print(adf)
 def exists(w):
     return w.lower() in word.words()
-
-for i in range(no_abs):
-    text = remove_brackets(adf.loc[i, "abstract"])
+for index , row in adf.iterrows():
+    text = remove_brackets(str(row[0]))
     cleaned_text = clean(text)
     
     #Synonym Code (maybe insert into cleaned text)
@@ -74,7 +72,7 @@ for i in range(no_full):
     fulls.append(cleaned_text)
 
 #Answer Matrix
-matrix = []
+# matrix = []
 
 #Xapian code start
 
