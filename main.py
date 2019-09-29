@@ -1,4 +1,4 @@
-# import xapian
+import xapian
 import os
 import sys
 import re
@@ -72,7 +72,7 @@ for i in range(no_full):
     fulls.append(cleaned_text)
 
 #Answer Matrix
-# matrix = []
+matrix = []
 
 #Xapian code start
 
@@ -85,9 +85,10 @@ def index(i, dbpath):
     db = xapian.WritableDatabase(dbpath, xapian.DB_CREATE_OR_OPEN)
 
     content = fulls[i]
-    print(content);
+    with open("fulls" + str(i) + ".txt", "w+") as fil:
+        fil.write(fulls[i])
     termgen = xapian.TermGenerator()
-    termgen.set_stopper_strategy(xapian.TermGenerator.STOP_ALL)
+    #termgen.set_stopper_strategy(xapian.TermGenerator.STOP_ALL)
     termgen.set_stemmer(xapian.Stem('en'))
 
     doc = xapian.Document()
@@ -95,10 +96,10 @@ def index(i, dbpath):
 
     termgen.index_text(content)
     db.add_document(doc)
-    f.close();
 
-for i in range(no_full):
-    index(i, dbpath)
+if not (os.path.exists(dbpath)):
+    for i in range(no_full):
+        index(i, dbpath)
 
 #querying for relevance
 
@@ -133,14 +134,14 @@ def search(dbpath, querystring, offset=0, pagesize=10):
     mset = enquire.get_mset(offset, pagesize)
 
     for match in enquire.get_mset(offset, pagesize):
-        matches.append(match.docid)
+        matches.append(match)
     
     return matches
 
-for i in range(no_abstracts):
+for i in range(no_abs):
     temp = []
     all_matches = search(dbpath, abstracts[i])
-    for j in range(no_fulls):
+    for j in range(no_full):
         cnt = 0
         for match in all_matches:
             if match.docid == j:
@@ -156,4 +157,4 @@ for i in range(no_abstracts):
 
 with open("./output_matrix.csv", "w+", newline = "") as f:
     writer = csv.writer(f)
-    writer.writerows(martix)
+    writer.writerows(matrix)
