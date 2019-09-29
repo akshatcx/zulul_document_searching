@@ -1,0 +1,11 @@
+Input:
+
+    We expect that there are two files present in the directory named "fulltext.csv" and "summaries.csv". 
+
+Project Description:
+
+    We went for a rule based approach. As we are considering only the cases regarding papers/websites/documents where we assume that the
+    content is without much sarcasm and humour. Because of that we can neglect some part of the context and focus on accuracy which is
+    better in rule based approach. We are focusing on many points like Named Entity Recognition, Stemming and Synonyms. We used BM-25
+    which was able to tell us a relevance score for each word in our query. We changed the weight of synonyms and NER accordingly
+    so that we get the optimum result.
