@@ -8,16 +8,19 @@ import string
 import pandas as pd
 import csv
 from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 from nltk.corpus import stopwords
 from nltk.corpus import words
 
-# nltk.download('punkt')
-# nltk.download('stopwords')
-# nltk.download('wordnet')
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('words')
 
 stop_words = stopwords.words('english')
 
+lemmatizer = WordNetLemmatizer()
 fdf = pd.read_csv("fulltext.csv")
 adf = pd.read_csv("summaries.csv",header=None)
 no_full = fdf.shape[0]
@@ -59,7 +62,7 @@ fulls = []
 
 # print(adf)
 def exists(w):
-    return w.lower() in word.words()
+    return w.lower() in words.words()
 for index , row in adf.iterrows():
     text = remove_brackets(str(row[0]))
     cleaned_text = clean(text)
@@ -115,22 +118,18 @@ def search(dbpath, querystring, offset=0, pagesize=10):
 
     db = xapian.Database(dbpath)
 
-    queryparser = xapian.QueryParser()
-    queryparser.set_stemmer(xapian.Stem("en"));
-    queryparser.set_stemming_strategy(queryparser.STEM_ALL)
-
     query_terms = querystring.split(' ')
     query_terms[0] = query_terms[0].lower()
     query = xapian.Query(query_terms[0])
-    query = xapian.Query(100, query)
+    # if not (exists(lemmatizer.lemmatize(query_terms[0]))):
+        # query = xapian.Query(10, query)
+    #query = xapian.Query(100, query)
     for i in range(1, len(query_terms)):
         query_terms[i] = query_terms[i].lower()
         query2 = xapian.Query(query_terms[i])
-        # if query_terms[i] is "5g":
-        #     print("does come here")
-        #     query2 = xapian.Query(100, query2)
-        query = xapian.Query(xapian.Query.OP_OR, query,
-                query2)
+        # if not (exists(lemmatizer.lemmatize(query_terms[i]))):
+            # query2 = xapian.Query(10, query2)
+        query = xapian.Query(xapian.Query.OP_OR, query, query2)
 
 
     enquire = xapian.Enquire(db)
@@ -144,7 +143,39 @@ def search(dbpath, querystring, offset=0, pagesize=10):
         matches.append(match)
     
     return matches
+
+def search2(dbpath, querystring, offset=0, pagesize=10):
+    db = xapian.Database(dbpath)
+
+    query_terms = querystring.split(' ')
+    query_terms[0] = query_terms[0].lower()
+    query = xapian.Query(query_terms[0])
+    # if not (exists(lemmatizer.lemmatize(query_terms[0]))):
+        # query = xapian.Query(10, query)
+    #query = xapian.Query(100, query)
+    for i in range(1, len(query_terms)):
+        query_terms[i] = query_terms[i].lower()
+        query2 = xapian.Query(query_terms[i])
+        # if not (exists(lemmatizer.lemmatize(query_terms[i]))):
+            # query2 = xapian.Query(10, query2)
+        query = xapian.Query(xapian.Query.OP_OR, query, query2)
+
+
+    enquire = xapian.Enquire(db)
+    enquire.set_query(query)
+
+    matches = []
+
+    mset = enquire.get_mset(offset, pagesize)
+    return mset
+
+
 tot_len=0
+
+divides = []
+for i in range(no_full):
+    mset = search2(dbpath, fulls[i])
+    divides.append(math.log10(mset.get_max_attained()+1))
 for i in fulls:
     tot_len+=len(i)
 for i in range(no_abs):
@@ -173,9 +204,15 @@ for i in range(no_abs):
             minn=i
     temp2=[]
     for i in temp:
-        temp2.append((i-minn)/(maxx-minn))
+        #temp2.append((i-minn)/(maxx-minn))
+        temp2.append(i)
     # temp=map(lambda a : (a-minn_element)/(maxx_element-minn_element) ,temp)
     matrix.append(temp2)
+for j in range(no_full):
+    for i in range(no_abs):
+        matrix[i][j]/=divides[j]
+       
+
 
 
 #Xapian Code end
