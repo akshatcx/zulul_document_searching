@@ -80,6 +80,8 @@ matrix = []
 
 dbpath = sys.argv[1]
 
+# fulls[0], fulls[3] = fulls[3], fulls[0]
+
 def index(i, dbpath):
 
     db = xapian.WritableDatabase(dbpath, xapian.DB_CREATE_OR_OPEN)
@@ -124,7 +126,6 @@ def search(dbpath, querystring, offset=0, pagesize=10):
         query = xapian.Query(xapian.Query.OP_OR, query,
                 query2)
 
-    print(query)
 
     enquire = xapian.Enquire(db)
     enquire.set_query(query)
@@ -144,7 +145,7 @@ for i in range(no_abs):
     for j in range(no_full):
         cnt = 0
         for match in all_matches:
-            if match.docid == j:
+            if match.docid == j+1:
                 temp.append(match.weight)
                 cnt = 1
         if not cnt:
