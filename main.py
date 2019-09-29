@@ -22,7 +22,7 @@ stop_words = stopwords.words('english')
 
 lemmatizer = WordNetLemmatizer()
 fdf = pd.read_csv("fulltext.csv")
-adf = pd.read_csv("summaries.csv",header=None)
+adf = pd.read_csv("summaries.csv")
 no_full = fdf.shape[0]
 no_abs = adf.shape[0]
 
@@ -63,10 +63,9 @@ fulls = []
 # print(adf)
 def exists(w):
     return w.lower() in words.words()
-for index , row in adf.iterrows():
-    text = remove_brackets(str(row[0]))
+for i in range(no_abs):
+    text = remove_brackets(adf.loc[i,"abstract"])
     cleaned_text = clean(text)
-    
     #Synonym Code (maybe insert into cleaned text)
     abstracts.append(cleaned_text)
 
@@ -82,6 +81,22 @@ for i in range(no_full):
 #fulls[4]=fulls[4]+" "+fulls[4]
 ###Answer Matrix
 matrix = []
+
+for i in range(no_abs):
+    for word in abstracts[i].split(" "):
+        counter = 1
+        for syn in wordnet.synsets(word):
+            for lemma in syn.lemmas():
+                if counter>5:
+                    break
+                abstracts[i]+=(" "+lemma.name()+" ")
+                counter+=1
+        abstracts[i]=abstracts[i].split(" ")
+        abstracts[i].remove(word)
+        abstracts[i]=" ".join(abstracts[i])
+
+
+        
 
 #Xapian code start
 
