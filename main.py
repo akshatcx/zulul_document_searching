@@ -2,6 +2,7 @@ import xapian
 import os
 import sys
 import re
+import math
 import nltk
 import string
 import pandas as pd
@@ -70,8 +71,13 @@ for i in range(no_full):
     text = remove_brackets(fdf.loc[i, "paper_text"])
     cleaned_text = clean(text)
     fulls.append(cleaned_text)
-
-#Answer Matrix
+# abstracts[0]=abstracts[0]+" "+abstracts[0]
+#fulls[0]=fulls[0]+" "+fulls[0]
+#fulls[1]=fulls[1]+" "+fulls[1]
+#fulls[2]=fulls[2]+" "+fulls[2]
+#fulls[3]=fulls[3]+" "+fulls[3]
+#fulls[4]=fulls[4]+" "+fulls[4]
+###Answer Matrix
 matrix = []
 
 #Xapian code start
@@ -85,7 +91,7 @@ dbpath = sys.argv[1]
 def index(i, dbpath):
 
     db = xapian.WritableDatabase(dbpath, xapian.DB_CREATE_OR_OPEN)
-
+    
     content = fulls[i]
     with open("fulls" + str(i) + ".txt", "w+") as fil:
         fil.write(fulls[i])
@@ -138,20 +144,38 @@ def search(dbpath, querystring, offset=0, pagesize=10):
         matches.append(match)
     
     return matches
-
+tot_len=0
+for i in fulls:
+    tot_len+=len(i)
 for i in range(no_abs):
     temp = []
     all_matches = search(dbpath, abstracts[i])
     for j in range(no_full):
         cnt = 0
+        flag=0
+        for match in all_matches:
+            if match.weight < 1:
+                flag=1
+                break
         for match in all_matches:
             if match.docid == j+1:
-                temp.append(match.weight)
+                temp.append(math.log10(match.weight+flag))
                 cnt = 1
         if not cnt:
             temp.append(0)
-
-    matrix.append(temp)
+    val=0
+    maxx = -1
+    minn = 10000000
+    for i in temp:
+        if i>maxx:
+            maxx=i
+        if i<minn:
+            minn=i
+    temp2=[]
+    for i in temp:
+        temp2.append((i-minn)/(maxx-minn))
+    # temp=map(lambda a : (a-minn_element)/(maxx_element-minn_element) ,temp)
+    matrix.append(temp2)
 
 
 #Xapian Code end
