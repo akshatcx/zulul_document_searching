@@ -1,5 +1,6 @@
 import xapian
 import os
+import sys
 import re
 import nltk
 import string
@@ -75,9 +76,86 @@ for i in range(no_full):
 #Answer Matrix
 matrix = []
 
-#Xapian Code
+#Xapian code start
+
+#indexing
+
+dbpath = sys.argv[1]
+
+def index(i, dbpath):
+
+    db = xapian.WritableDatabase(dbpath, xapian.DB_CREATE_OR_OPEN)
+
+    content = fulls[i]
+    print(content);
+    termgen = xapian.TermGenerator()
+    termgen.set_stopper_strategy(xapian.TermGenerator.STOP_ALL)
+    termgen.set_stemmer(xapian.Stem('en'))
+
+    doc = xapian.Document()
+    termgen.set_document(doc)
+
+    termgen.index_text(content)
+    db.add_document(doc)
+    f.close();
+
+for i in range(no_full):
+    index(i, dbpath)
+
+#querying for relevance
+
+def search(dbpath, querystring, offset=0, pagesize=10):
+
+    db = xapian.Database(dbpath)
+
+    queryparser = xapian.QueryParser()
+    queryparser.set_stemmer(xapian.Stem("en"));
+    queryparser.set_stemming_strategy(queryparser.STEM_ALL)
+
+    query_terms = querystring.split(' ')
+    query_terms[0] = query_terms[0].lower()
+    query = xapian.Query(query_terms[0])
+    query = xapian.Query(100, query)
+    for i in range(1, len(query_terms)):
+        query_terms[i] = query_terms[i].lower()
+        query2 = xapian.Query(query_terms[i])
+        # if query_terms[i] is "5g":
+        #     print("does come here")
+        #     query2 = xapian.Query(100, query2)
+        query = xapian.Query(xapian.Query.OP_OR, query,
+                query2)
+
+    print(query)
+
+    enquire = xapian.Enquire(db)
+    enquire.set_query(query)
+
+    matches = []
+
+    mset = enquire.get_mset(offset, pagesize)
+
+    for match in enquire.get_mset(offset, pagesize):
+        matches.append(match.docid)
+    
+    return matches
+
+for i in range(no_abstracts):
+    temp = []
+    all_matches = search(dbpath, abstracts[i])
+    for j in range(no_fulls):
+        cnt = 0
+        for match in all_matches:
+            if match.docid == j:
+                temp.append(match.weight)
+                cnt = 1
+        if not cnt:
+            temp.append(0)
+
+    matrix.append(temp)
+
+
+#Xapian Code end
 
 with open("./output_matrix.csv", "w+", newline = "") as f:
     writer = csv.writer(f)
     writer.writerows(martix)
-
